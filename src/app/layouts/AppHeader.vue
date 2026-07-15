@@ -37,7 +37,7 @@
 
 <script setup>
 import AppNavigation from './AppNavigation.vue'
-/*import { RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 const onSearch = () => {
   // TODO: 검색 모달/페이지 구현 예정
@@ -48,7 +48,7 @@ const onSearch = () => {
 const onUser = () => {
   // TODO: 사용자 메뉴 구현 예정
   console.log('사용자 버튼 클릭 - TODO: 로그인/프로필 동작 구현')
-}*/
+}
 </script>
 
 <style scoped>

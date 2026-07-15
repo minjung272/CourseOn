@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-/*import { computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -37,7 +37,7 @@ const isActive = (item) => {
   const path = route.path || '/'
   if (item.to === '/') return path === '/'
   return path.startsWith(item.to)
-}*/
+}
 </script>
 
 <style scoped>

@@ -1,0 +1,28 @@
+@import './variables.css';
+
+* { box-sizing: border-box; }
+html,body,#app { height: 100%; }
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 링크/버튼 기본 스타일 */
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+/* 반응형 최소 규칙 (PC 우선) */
+@media (max-width: 1024px) {
+  .app-nav ul { gap: 18px; }
+  .container { padding: 0 20px; }
+}
+
+@media (max-width: 768px) {
+  /* 모바일 제안: 햄버거 토글로 변경 (구현은 추가) */
+  .app-nav ul { gap: 12px; font-size: 14px; }
+  .logo-text { font-size: 16px; }
+}

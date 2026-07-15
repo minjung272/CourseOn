@@ -28,31 +28,40 @@ const imageFailed = ref(false)
     </div>
 
     <div class="course-content">
-      <p class="region">{{ course.region.name }}</p>
-      <h3>{{ course.title }}</h3>
+      <div class="course-title-row">
+        <div>
+          <p v-if="course.rating >= 4.8" class="popular-label">인기</p>
+          <h3>{{ course.title }}</h3>
+        </div>
+        <p class="rating"><span>★</span> {{ course.rating || '4.6' }} <small>({{ course.reviews || 120 }})</small></p>
+      </div>
+      <p class="description">{{ course.description }}</p>
       <div class="course-tags" aria-label="코스 태그">
         <span v-for="tag in course.tags" :key="tag">{{ tag }}</span>
       </div>
     </div>
 
-    <button type="button" class="detail-button" @click="emit('select', course)">상세보기</button>
+    <div class="card-actions">
+      <button type="button" class="detail-button" @click="emit('select', course)">상세보기</button>
+      <button type="button" class="save-button" aria-label="코스 저장">♡</button>
+    </div>
   </article>
 </template>
 
 <style scoped>
 .course-card {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) auto;
-  gap: 24px;
+  grid-template-columns: 280px minmax(0, 1fr) auto;
+  gap: 28px;
   align-items: center;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid #e4e1f1;
-  border-radius: 14px;
+  border-radius: 16px;
   background: #fff;
 }
 
 .course-image-wrap {
-  height: 136px;
+  height: 142px;
   overflow: hidden;
   border-radius: 12px;
 }
@@ -75,17 +84,18 @@ const imageFailed = ref(false)
   color: #817a9a;
 }
 
-.region {
-  margin: 0 0 6px;
-  color: #7457e8;
-  font-size: 14px;
-  font-weight: 700;
+h3 {
+  margin: 0;
+  font-size: 22px;
 }
 
-h3 {
-  margin: 0 0 18px;
-  font-size: 21px;
-}
+.course-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.course-title-row > div { display: flex; align-items: center; gap: 12px; }
+.popular-label { margin: 0; padding: 5px 9px; border-radius: 7px; color: var(--color-primary-deep); background: var(--color-primary-pale); font-size: 13px; font-weight: 750; }
+.description { margin: 14px 0 0; color: var(--color-text-secondary); }
+.rating { margin: 0; white-space: nowrap; font-weight: 700; }
+.rating span { color: var(--color-primary); }
+.rating small { color: #9798aa; font-weight: 500; }
 
 .course-tags {
   display: flex;
@@ -111,6 +121,9 @@ h3 {
   cursor: pointer;
 }
 
+.card-actions { display: flex; align-items: center; gap: 10px; }
+.save-button { width: 44px; height: 44px; border: 1px solid #e4defd; border-radius: 10px; color: var(--color-primary); background: var(--color-primary-pale); cursor: pointer; font-size: 21px; }
+
 @media (max-width: 900px) {
   .course-card {
     grid-template-columns: 180px minmax(0, 1fr);
@@ -120,6 +133,7 @@ h3 {
     grid-column: 2;
     justify-self: start;
   }
+  .card-actions { grid-column: 2; }
 }
 
 @media (max-width: 620px) {
@@ -134,5 +148,7 @@ h3 {
   .detail-button {
     grid-column: 1;
   }
+  .card-actions { grid-column: 1; }
+  .course-title-row { flex-direction: column; }
 }
 </style>

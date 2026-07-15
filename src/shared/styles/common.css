@@ -1,28 +1,105 @@
 @import './variables.css';
 
 * { box-sizing: border-box; }
-html,body,#app { height: 100%; }
+html { min-width: 320px; background: var(--color-background); }
+html, body, #app { min-height: 100%; }
 body {
   margin: 0;
-  background: var(--color-background);
+  background:
+    radial-gradient(circle at 15% 5%, rgba(116, 87, 245, 0.035), transparent 28%),
+    var(--color-background);
   color: var(--color-text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: Pretendard, "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  word-break: keep-all;
 }
 
-/* 링크/버튼 기본 스타일 */
 a { color: inherit; text-decoration: none; }
-button { font-family: inherit; }
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { color: inherit; }
+img { display: block; max-width: 100%; }
 
-/* 반응형 최소 규칙 (PC 우선) */
-@media (max-width: 1024px) {
-  .app-nav ul { gap: 18px; }
-  .container { padding: 0 20px; }
+:focus-visible {
+  outline: 3px solid rgba(116, 87, 245, 0.28);
+  outline-offset: 2px;
 }
 
-@media (max-width: 768px) {
-  /* 모바일 제안: 햄버거 토글로 변경 (구현은 추가) */
-  .app-nav ul { gap: 12px; font-size: 14px; }
-  .logo-text { font-size: 16px; }
+.page-shell {
+  width: min(calc(100% - 48px), var(--layout-max-width));
+  margin: 0 auto;
+  padding: 36px 0 54px;
+}
+
+.surface {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-title { margin: 0; font-size: clamp(26px, 3vw, 36px); letter-spacing: -0.04em; }
+.page-description { margin: 10px 0 0; color: var(--color-text-secondary); line-height: 1.65; }
+
+.primary-button,
+.outline-button {
+  min-height: 46px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.primary-button {
+  border: 0;
+  color: white;
+  background: linear-gradient(135deg, #8164ff, #6845e9);
+  box-shadow: 0 9px 20px rgba(104, 69, 233, 0.2);
+}
+
+.outline-button {
+  border: 1px solid #8f77f8;
+  color: var(--color-primary-deep);
+  background: white;
+}
+
+.primary-button:hover,
+.outline-button:hover { transform: translateY(-1px); }
+
+.tag-chip {
+  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 7px;
+  color: var(--color-primary-deep);
+  background: var(--color-primary-pale);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1024px) {
+  .page-shell { width: min(calc(100% - 36px), var(--layout-max-width)); padding-top: 28px; }
+}
+
+@media (max-width: 640px) {
+  .page-shell { width: min(calc(100% - 24px), var(--layout-max-width)); padding: 20px 0 38px; }
+  .surface { border-radius: 16px; }
 }

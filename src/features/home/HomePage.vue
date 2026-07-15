@@ -11,7 +11,7 @@
         </div>
 
         <div class="course-grid">
-          <!-- <CourseCard v-for="course in courses" :key="course.id" :course="course" /> -->
+          <CourseCard v-for="course in courses" :key="course.id" :course="course" />
         </div>
       </section>
 
@@ -29,46 +29,13 @@ import SearchPanel from './components/SearchPanel.vue'
 import CourseCard from './components/CourseCard.vue'
 import SeoulMapPanel from './components/SeoulMapPanel.vue'
 import TravelStats from './components/TravelStats.vue'
+import { featuredCourses } from '../../shared/data/demoContent'
 
-import bukchonImage from '../../assets/images/course-bukchon.jpg'
-import namsanImage from '../../assets/images/course-namsan.jpg'
-import hangangImage from '../../assets/images/course-hangang.jpg'
-
-const courses = [
-  {
-    id: 1,
-    rank: 1,
-    title: '북촌 한옥 마을 코스',
-    description: '전통과 감성이 공존하는 시간',
-    tags: ['전통', '산책', '사진명소'],
-    duration: '3시간',
-    transport: '도보 중심',
-    image: bukchonImage,
-    imageAlt: '북촌 한옥마을 골목길',
-  },
-  {
-    id: 2,
-    rank: 2,
-    title: '남산 야경 코스',
-    description: '서울의 야경을 한눈에',
-    tags: ['야경', '전망대', '데이트'],
-    duration: '4시간',
-    transport: '케이블카 포함',
-    image: namsanImage,
-    imageAlt: '노을 아래 남산서울타워',
-  },
-  {
-    id: 3,
-    rank: 3,
-    title: '한강 감성 코스',
-    description: '여유로운 한강에서의 하루',
-    tags: ['한강', '피크닉', '감성'],
-    duration: '3시간',
-    transport: '대중교통 이용',
-    image: hangangImage,
-    imageAlt: '야경이 비치는 한강과 다리',
-  },
-]
+const courses = [featuredCourses[1], featuredCourses[2], featuredCourses[0]].map((course, index) => ({
+  ...course,
+  rank: index + 1,
+  image: course.imageUrl,
+}))
 </script>
 
 <style scoped>

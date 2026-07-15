@@ -19,6 +19,12 @@ export async function fetchCourses() {
   return cachedCourses
 }
 
+export async function fetchCourseById(courseId) {
+  const courses = await fetchCourses()
+
+  return courses.find((course) => String(course.id) === String(courseId)) ?? null
+}
+
 export function filterCourses(courses, keyword = '', selectedTags = []) {
   const normalizedKeyword = keyword.trim().toLowerCase()
 

@@ -4,6 +4,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+try:
+    from .course_rules import infer_tags
+except ImportError:
+    from course_rules import infer_tags
+
 
 SCHEMA_VERSION = "1.0"
 TRAVEL_COURSE_CONTENT_TYPE_ID = "25"
@@ -73,6 +78,7 @@ def normalize_course(
     content_type_id: str,
 ) -> dict[str, Any]:
     course_id = require_string(item.get("contentid"), "contentid", item_index)
+    title = require_string(item.get("title"), "title", item_index)
     region_code = require_string(item.get("areacode"), "areacode", item_index)
     item_content_type_id = require_string(
         item.get("contenttypeid"), "contenttypeid", item_index
@@ -88,7 +94,7 @@ def normalize_course(
     return {
         "key": f"{region_code}-{course_id}",
         "id": course_id,
-        "title": require_string(item.get("title"), "title", item_index),
+        "title": title,
         "region": {
             "code": region_code,
             "name": region_name,
@@ -110,7 +116,7 @@ def normalize_course(
             "middleCode": clean_string(item.get("cat2")),
             "detailCode": clean_string(item.get("cat3")),
         },
-        "tags": [],
+        "tags": infer_tags(title),
         "copyrightType": clean_string(item.get("cpyrhtDivCd")),
         "createdAt": parse_timestamp(
             item.get("createdtime"), "createdtime", item_index

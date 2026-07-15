@@ -31,7 +31,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-30T02:33:24",
       "modifiedAt": "2025-08-20T18:10:00"
@@ -61,7 +63,10 @@
         "middleCode": "C0117",
         "detailCode": "C01170001"
       },
-      "tags": [],
+      "tags": [
+        "맛집",
+        "혼자"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2016-05-24T02:42:19",
       "modifiedAt": "2025-05-20T10:55:21"
@@ -91,7 +96,9 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2016-05-13T23:28:38",
       "modifiedAt": "2025-05-20T10:55:06"
@@ -121,7 +128,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2016-04-29T02:38:06",
       "modifiedAt": "2025-05-20T10:54:20"
@@ -151,7 +160,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "야경"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-08-07T20:25:39",
       "modifiedAt": "2025-05-20T10:49:31"
@@ -181,7 +192,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-25T00:59:00",
       "modifiedAt": "2023-08-16T11:19:28"
@@ -211,7 +224,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "자연"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-05-23T01:32:04",
       "modifiedAt": "2023-08-11T10:41:12"
@@ -241,7 +256,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-10-01T01:36:09",
       "modifiedAt": "2023-08-11T10:26:32"
@@ -271,7 +288,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "자연"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-12-19T01:30:15",
       "modifiedAt": "2023-08-11T10:17:24"
@@ -301,7 +320,10 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-01-24T23:52:46",
       "modifiedAt": "2023-08-11T10:02:28"
@@ -331,7 +353,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "야경"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-12-17T00:26:46",
       "modifiedAt": "2023-08-11T09:37:20"
@@ -391,7 +415,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-30T02:25:36",
       "modifiedAt": "2023-08-10T14:35:06"
@@ -421,7 +447,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-11-05T22:10:17",
       "modifiedAt": "2023-08-10T14:34:32"
@@ -451,7 +479,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "자연",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-12-02T01:48:50",
       "modifiedAt": "2023-08-10T11:27:34"
@@ -481,7 +512,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "체험"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-04-18T00:48:58",
       "modifiedAt": "2023-08-10T11:22:37"
@@ -511,7 +544,9 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-01-17T00:54:23",
       "modifiedAt": "2023-08-10T11:01:53"
@@ -541,7 +576,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "자연",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-12-19T02:05:52",
       "modifiedAt": "2023-08-10T10:38:36"
@@ -571,7 +609,10 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-30T02:47:47",
       "modifiedAt": "2023-08-10T10:15:01"
@@ -601,7 +642,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-01-25T00:25:27",
       "modifiedAt": "2023-08-10T09:53:21"
@@ -631,7 +674,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-10-01T00:57:49",
       "modifiedAt": "2023-08-10T09:45:32"
@@ -661,7 +706,10 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-30T02:55:53",
       "modifiedAt": "2023-08-10T09:31:17"
@@ -691,7 +739,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "맛집",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-09-24T04:35:14",
       "modifiedAt": "2023-08-09T17:11:42"
@@ -721,7 +772,9 @@
         "middleCode": "C0114",
         "detailCode": "C01140001"
       },
-      "tags": [],
+      "tags": [
+        "산책"
+      ],
       "copyrightType": null,
       "createdAt": "2014-05-23T02:16:06",
       "modifiedAt": "2023-08-09T16:34:09"
@@ -751,7 +804,10 @@
         "middleCode": "C0114",
         "detailCode": "C01140001"
       },
-      "tags": [],
+      "tags": [
+        "문화예술",
+        "체험"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-04-23T01:15:59",
       "modifiedAt": "2023-08-09T16:27:49"
@@ -781,7 +837,10 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "문화예술",
+        "체험"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-05-29T01:14:04",
       "modifiedAt": "2023-08-09T15:45:12"
@@ -841,7 +900,9 @@
         "middleCode": "C0117",
         "detailCode": "C01170001"
       },
-      "tags": [],
+      "tags": [
+        "맛집"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2016-05-30T19:37:27",
       "modifiedAt": "2023-08-09T14:18:22"
@@ -871,7 +932,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-11-05T00:33:28",
       "modifiedAt": "2023-08-09T14:13:59"
@@ -901,7 +964,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-25T01:11:31",
       "modifiedAt": "2023-08-09T14:13:19"
@@ -931,7 +996,10 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행",
+        "혼자"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-07-17T23:20:46",
       "modifiedAt": "2023-08-09T13:25:31"
@@ -961,7 +1029,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "문화예술"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-10-01T01:12:00",
       "modifiedAt": "2023-08-09T11:29:26"
@@ -991,7 +1062,11 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "자연",
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-25T01:05:50",
       "modifiedAt": "2023-08-09T11:25:58"
@@ -1021,7 +1096,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "자연"
+      ],
       "copyrightType": null,
       "createdAt": "2014-04-24T00:39:46",
       "modifiedAt": "2023-08-09T10:25:00"
@@ -1081,7 +1158,9 @@
         "middleCode": "C0113",
         "detailCode": "C01130001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-12-18T02:14:19",
       "modifiedAt": "2023-08-09T09:34:23"
@@ -1111,7 +1190,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2019-02-14T01:00:20",
       "modifiedAt": "2023-08-09T09:08:47"
@@ -1141,7 +1222,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "자연"
+      ],
       "copyrightType": null,
       "createdAt": "2014-09-25T01:38:51",
       "modifiedAt": "2023-08-09T09:07:58"
@@ -1171,7 +1254,9 @@
         "middleCode": "C0114",
         "detailCode": "C01140001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-01-25T00:14:47",
       "modifiedAt": "2023-08-08T17:21:35"
@@ -1201,7 +1286,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "맛집"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-12-19T01:41:02",
       "modifiedAt": "2023-08-08T17:04:47"
@@ -1261,7 +1348,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-04-23T23:59:25",
       "modifiedAt": "2023-08-08T16:57:53"
@@ -1291,7 +1380,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "산책"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-09-25T01:45:46",
       "modifiedAt": "2023-08-08T16:18:58"
@@ -1321,7 +1413,9 @@
         "middleCode": "C0114",
         "detailCode": "C01140001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-04-23T01:24:42",
       "modifiedAt": "2023-08-08T15:30:59"
@@ -1351,7 +1445,9 @@
         "middleCode": "C0114",
         "detailCode": "C01140001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": null,
       "createdAt": "2014-05-23T01:41:48",
       "modifiedAt": "2023-08-08T15:27:26"
@@ -1381,7 +1477,9 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-10-01T01:27:32",
       "modifiedAt": "2023-08-08T15:05:55"
@@ -1411,7 +1509,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "문화예술"
+      ],
       "copyrightType": null,
       "createdAt": "2014-10-01T01:04:57",
       "modifiedAt": "2023-08-08T14:30:49"
@@ -1441,7 +1542,10 @@
         "middleCode": "C0115",
         "detailCode": "C01150001"
       },
-      "tags": [],
+      "tags": [
+        "자연",
+        "야경"
+      ],
       "copyrightType": null,
       "createdAt": "2014-12-19T01:59:39",
       "modifiedAt": "2023-08-08T13:04:54"
@@ -1471,7 +1575,9 @@
         "middleCode": "C0117",
         "detailCode": "C01170001"
       },
-      "tags": [],
+      "tags": [
+        "체험"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2015-10-28T17:53:26",
       "modifiedAt": "2023-08-08T13:00:24"
@@ -1501,7 +1607,10 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "역사",
+        "자연"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2014-04-18T00:36:03",
       "modifiedAt": "2023-08-08T10:39:37"
@@ -1531,7 +1640,9 @@
         "middleCode": "C0112",
         "detailCode": "C01120001"
       },
-      "tags": [],
+      "tags": [
+        "도심여행"
+      ],
       "copyrightType": "Type3",
       "createdAt": "2016-06-29T02:15:30",
       "modifiedAt": "2023-08-08T10:38:48"

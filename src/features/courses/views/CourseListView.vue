@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import CourseCard from '../components/CourseCard.vue'
 import CourseFilter from '../components/CourseFilter.vue'
+import CourseDetailView from './CourseDetailView.vue'
 import { collectCourseTags, fetchCourses, filterCourses } from '../services/courseService'
 
 const emit = defineEmits(['select-course'])
@@ -13,6 +14,7 @@ const selectedTags = ref([])
 const currentPage = ref(1)
 const loading = ref(true)
 const errorMessage = ref('')
+const selectedCourseId = ref(null)
 
 const tags = computed(() => collectCourseTags(courses.value))
 const filteredCourses = computed(() =>
@@ -52,10 +54,25 @@ function resetFilters() {
 function movePage(page) {
   currentPage.value = Math.min(Math.max(page, 1), totalPages.value)
 }
+
+function showCourseDetail(course) {
+  selectedCourseId.value = course.id
+  emit('select-course', course)
+}
+
+function showCourseList() {
+  selectedCourseId.value = null
+}
 </script>
 
 <template>
-  <main class="course-list-page">
+  <CourseDetailView
+    v-if="selectedCourseId"
+    :course-id="selectedCourseId"
+    @back="showCourseList"
+  />
+
+  <main v-else class="course-list-page">
     <CourseFilter
       v-model:keyword="keyword"
       :tags="tags"
@@ -78,7 +95,7 @@ function movePage(page) {
             v-for="course in visibleCourses"
             :key="course.key"
             :course="course"
-            @select="emit('select-course', $event)"
+            @select="showCourseDetail"
           />
         </div>
         <p v-else class="status-message">검색 조건에 맞는 여행코스가 없습니다.</p>

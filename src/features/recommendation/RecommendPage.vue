@@ -1,5 +1,6 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Activity,
   Bike,
@@ -24,6 +25,13 @@ import {
 } from '@lucide/vue'
 import RecommendationOptionGroup from './components/RecommendationOptionGroup.vue'
 import tagMappings from './data/tagMappings.json'
+import {
+  buildConditionQuery,
+  parseConditions,
+} from './services/recommendationService'
+
+const route = useRoute()
+const router = useRouter()
 
 function mappedOption(groupKey, value, icon) {
   return {
@@ -108,26 +116,7 @@ const conditionGroups = [
   },
 ]
 
-const selectedConditions = reactive({
-  companion: '',
-  interests: [],
-  preferredArea: '',
-  travelStyle: '',
-  transport: '',
-})
-
-const selectedUserTags = computed(() => {
-  const tags = conditionGroups.flatMap((group) => {
-    const selectedValue = selectedConditions[group.key]
-    const selectedValues = Array.isArray(selectedValue) ? selectedValue : [selectedValue]
-
-    return group.options
-      .filter((option) => selectedValues.includes(option.value))
-      .flatMap((option) => option.userTags)
-  })
-
-  return [...new Set(tags)]
-})
+const selectedConditions = reactive(parseConditions(route.query))
 
 function selectCondition(group, value) {
   if (!group.multiple) {
@@ -142,10 +131,9 @@ function selectCondition(group, value) {
 }
 
 function submitConditions() {
-  // The recommendation service will consume this normalized object in the next step.
-  console.info('Selected recommendation conditions:', {
-    conditions: { ...selectedConditions },
-    userTags: selectedUserTags.value,
+  router.push({
+    name: 'RecommendResult',
+    query: buildConditionQuery(selectedConditions),
   })
 }
 </script>

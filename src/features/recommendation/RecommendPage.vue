@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import {
   Activity,
   Bike,
@@ -23,6 +23,15 @@ import {
   UsersRound,
 } from '@lucide/vue'
 import RecommendationOptionGroup from './components/RecommendationOptionGroup.vue'
+import tagMappings from './data/tagMappings.json'
+
+function mappedOption(groupKey, value, icon) {
+  return {
+    value,
+    icon,
+    ...tagMappings.mappings[groupKey][value],
+  }
+}
 
 const conditionGroups = [
   {
@@ -33,10 +42,10 @@ const conditionGroups = [
     columns: 4,
     multiple: false,
     options: [
-      { value: 'solo', label: '혼자', icon: UserRound },
-      { value: 'couple', label: '연인/커플', icon: Heart },
-      { value: 'friends', label: '친구', icon: UsersRound },
-      { value: 'family', label: '가족', icon: House },
+      mappedOption('companion', 'solo', UserRound),
+      mappedOption('companion', 'couple', Heart),
+      mappedOption('companion', 'friends', UsersRound),
+      mappedOption('companion', 'family', House),
     ],
   },
   {
@@ -47,11 +56,11 @@ const conditionGroups = [
     columns: 5,
     multiple: true,
     options: [
-      { value: 'hotplace-photo', label: '핫플/사진', icon: Camera },
-      { value: 'history-culture', label: '역사/문화', icon: Landmark },
-      { value: 'nature-healing', label: '자연/힐링', icon: Leaf },
-      { value: 'food-cafe', label: '미식/카페', icon: Coffee },
-      { value: 'shopping', label: '쇼핑', icon: ShoppingBag },
+      mappedOption('interests', 'hotplace-photo', Camera),
+      mappedOption('interests', 'history-culture', Landmark),
+      mappedOption('interests', 'nature-healing', Leaf),
+      mappedOption('interests', 'food-cafe', Coffee),
+      mappedOption('interests', 'shopping', ShoppingBag),
     ],
   },
   {
@@ -62,11 +71,11 @@ const conditionGroups = [
     columns: 5,
     multiple: false,
     options: [
-      { value: 'gangbuk', label: '강북 (종로, 성북 등)', icon: MapPin },
-      { value: 'gangnam', label: '강남 (강남, 서초 등)', icon: MapPin },
-      { value: 'hongdae-mapo', label: '홍대/마포', icon: MapPin },
-      { value: 'seongsu-ttukseom', label: '성수/뚝섬', icon: MapPin },
-      { value: 'yeouido-yeongdeungpo', label: '여의도/영등포', icon: MapPin },
+      mappedOption('preferredArea', 'gangbuk', MapPin),
+      mappedOption('preferredArea', 'gangnam', MapPin),
+      mappedOption('preferredArea', 'hongdae-mapo', MapPin),
+      mappedOption('preferredArea', 'seongsu-ttukseom', MapPin),
+      mappedOption('preferredArea', 'yeouido-yeongdeungpo', MapPin),
     ],
   },
   {
@@ -77,10 +86,10 @@ const conditionGroups = [
     columns: 4,
     multiple: false,
     options: [
-      { value: 'healing', label: '여유롭게 힐링', icon: Clock3 },
-      { value: 'highlights', label: '알차게 핵심만', icon: CircleCheckBig },
-      { value: 'activity', label: '체험 & 액티비티', icon: Activity },
-      { value: 'luxury', label: '럭셔리 & 특별하게', icon: Gem },
+      mappedOption('travelStyle', 'healing', Clock3),
+      mappedOption('travelStyle', 'highlights', CircleCheckBig),
+      mappedOption('travelStyle', 'activity', Activity),
+      mappedOption('travelStyle', 'luxury', Gem),
     ],
   },
   {
@@ -91,10 +100,10 @@ const conditionGroups = [
     columns: 4,
     multiple: false,
     options: [
-      { value: 'public', label: '대중교통', icon: BusFront },
-      { value: 'walking', label: '도보 위주', icon: Footprints },
-      { value: 'bike', label: '자전거/킥보드', icon: Bike },
-      { value: 'car', label: '자동차', icon: Car },
+      mappedOption('transport', 'public', BusFront),
+      mappedOption('transport', 'walking', Footprints),
+      mappedOption('transport', 'bike', Bike),
+      mappedOption('transport', 'car', Car),
     ],
   },
 ]
@@ -105,6 +114,19 @@ const selectedConditions = reactive({
   preferredArea: '',
   travelStyle: '',
   transport: '',
+})
+
+const selectedUserTags = computed(() => {
+  const tags = conditionGroups.flatMap((group) => {
+    const selectedValue = selectedConditions[group.key]
+    const selectedValues = Array.isArray(selectedValue) ? selectedValue : [selectedValue]
+
+    return group.options
+      .filter((option) => selectedValues.includes(option.value))
+      .flatMap((option) => option.userTags)
+  })
+
+  return [...new Set(tags)]
 })
 
 function selectCondition(group, value) {
@@ -121,7 +143,10 @@ function selectCondition(group, value) {
 
 function submitConditions() {
   // The recommendation service will consume this normalized object in the next step.
-  console.info('Selected recommendation conditions:', { ...selectedConditions })
+  console.info('Selected recommendation conditions:', {
+    conditions: { ...selectedConditions },
+    userTags: selectedUserTags.value,
+  })
 }
 </script>
 

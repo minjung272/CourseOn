@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { fetchCourseById } from '../services/courseService'
 
 const props = defineProps({
@@ -10,11 +11,17 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['back', 'show-map'])
+const router = useRouter()
 
 const course = ref(null)
 const loading = ref(true)
 const errorMessage = ref('')
 const imageFailed = ref(false)
+
+function goToCourseList() {
+  emit('back')
+  router.push({ name: 'Courses' })
+}
 
 const modifiedDate = computed(() => {
   if (!course.value?.modifiedAt) {
@@ -52,7 +59,7 @@ watch(
 
 <template>
   <main class="course-detail-page">
-    <button type="button" class="back-button" @click="emit('back')">← 여행코스 목록</button>
+    <button type="button" class="back-button" @click="goToCourseList">← 여행코스 목록</button>
 
     <p v-if="loading" class="status-message">여행코스 정보를 불러오는 중입니다.</p>
     <p v-else-if="errorMessage" class="status-message error">{{ errorMessage }}</p>

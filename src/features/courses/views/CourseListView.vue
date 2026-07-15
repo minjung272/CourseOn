@@ -1,11 +1,12 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import CourseCard from '../components/CourseCard.vue'
 import CourseFilter from '../components/CourseFilter.vue'
-import CourseDetailView from './CourseDetailView.vue'
 import { collectCourseTags, fetchCourses, filterCourses } from '../services/courseService'
 
 const emit = defineEmits(['select-course'])
+const router = useRouter()
 
 const PAGE_SIZE = 6
 const courses = ref([])
@@ -14,7 +15,6 @@ const selectedTags = ref([])
 const currentPage = ref(1)
 const loading = ref(true)
 const errorMessage = ref('')
-const selectedCourseId = ref(null)
 
 const tags = computed(() => collectCourseTags(courses.value))
 const filteredCourses = computed(() =>
@@ -56,23 +56,13 @@ function movePage(page) {
 }
 
 function showCourseDetail(course) {
-  selectedCourseId.value = course.id
   emit('select-course', course)
-}
-
-function showCourseList() {
-  selectedCourseId.value = null
+  router.push({ name: 'CourseDetail', params: { courseId: course.id } })
 }
 </script>
 
 <template>
-  <CourseDetailView
-    v-if="selectedCourseId"
-    :course-id="selectedCourseId"
-    @back="showCourseList"
-  />
-
-  <main v-else class="course-list-page">
+  <main class="course-list-page">
     <CourseFilter
       v-model:keyword="keyword"
       :tags="tags"

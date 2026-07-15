@@ -7,12 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-.DS_Store
-dist
-dist-ssr
-coverage
+# Dependencies and build
+node_modules/
+dist/
+dist-ssr/
+coverage/
+
+# Environment variables
+.env
+.env.*
+!.env.example
 *.local
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # Editor directories and files
 .vscode/*
@@ -25,7 +34,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-
 .eslintcache
 
 # Cypress

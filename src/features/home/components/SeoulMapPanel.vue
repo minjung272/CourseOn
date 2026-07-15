@@ -5,7 +5,7 @@
       <RouterLink to="/map">지도에서 더보기 <span aria-hidden="true">↗</span></RouterLink>
     </div>
     <RouterLink class="map-link" to="/map" aria-label="서울 추천 지도 보기">
-      <img src="../../../assets/images/seoul-map.jpg" alt="북촌한옥마을, 경복궁, 명동, 남산서울타워, 잠실한강공원이 표시된 서울 지도" />
+      <img src="../../../assets/images/hero-seoul.jpg" alt="서울 추천 지도 임시 이미지" />
     </RouterLink>
   </section>
 </template>

@@ -2,8 +2,17 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   { path: '/', name: 'Home', component: () => import('../../features/home/HomePage.vue') },
-  { path: '/courses', name: 'Courses', component: () => import('../../features/home/CoursesPage.vue') },
-  { path: '/courses/:id', name: 'CourseDetail', component: () => import('../../features/courses/CourseDetail.vue') },
+  {
+    path: '/courses',
+    name: 'Courses',
+    component: () => import('../../features/courses/views/CourseListView.vue'),
+  },
+  {
+    path: '/courses/:courseId',
+    name: 'CourseDetail',
+    component: () => import('../../features/courses/views/CourseDetailView.vue'),
+    props: true,
+  },
   { path: '/recommend', name: 'Recommend', component: () => import('../../features/recommendation/RecommendPage.vue') },
   { path: '/recommend/result', name: 'RecommendResult', component: () => import('../../features/recommendation/RecommendResult.vue') },
   { path: '/map', name: 'Map', component: () => import('../../features/map/MapPage.vue') },

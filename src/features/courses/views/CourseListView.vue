@@ -62,7 +62,7 @@ function showCourseDetail(course) {
 </script>
 
 <template>
-  <main class="course-list-page">
+  <main class="course-list-page page-shell">
     <CourseFilter
       v-model:keyword="keyword"
       :tags="tags"
@@ -78,6 +78,7 @@ function showCourseDetail(course) {
       <template v-else>
         <header class="result-header">
           <p>총 <strong>{{ filteredCourses.length }}</strong>개의 서울 여행코스</p>
+          <select aria-label="정렬 방식"><option>인기순</option><option>최신순</option><option>평점순</option></select>
         </header>
 
         <div v-if="visibleCourses.length" class="course-cards">
@@ -122,9 +123,6 @@ function showCourseDetail(course) {
   display: grid;
   grid-template-columns: 290px minmax(0, 1fr);
   gap: 22px;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 36px 24px;
   color: #211e2a;
 }
 
@@ -138,6 +136,9 @@ function showCourseDetail(course) {
 
 .result-header {
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .result-header p {
@@ -147,6 +148,8 @@ function showCourseDetail(course) {
 .result-header strong {
   color: #6847df;
 }
+
+.result-header select { min-width: 170px; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 9px; background: white; }
 
 .course-cards {
   display: grid;
@@ -194,7 +197,6 @@ function showCourseDetail(course) {
 @media (max-width: 760px) {
   .course-list-page {
     grid-template-columns: 1fr;
-    padding: 20px 14px;
   }
 }
 </style>

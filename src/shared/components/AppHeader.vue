@@ -15,7 +15,7 @@
         class="menu-button"
         type="button"
         :aria-expanded="isMenuOpen"
-        aria-label="메뉴 열기"
+        :aria-label="isMenuOpen ? '메뉴 닫기' : '메뉴 열기'"
         @click="isMenuOpen = !isMenuOpen"
       >
         <span></span><span></span><span></span>
@@ -28,12 +28,12 @@
       </nav>
 
       <div class="header-actions">
-        <button class="icon-button" type="button" aria-label="검색">
+        <RouterLink class="icon-button" to="/courses" aria-label="코스 검색">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
             <path d="m16.2 16.2 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-        </button>
+        </RouterLink>
         <button class="profile-button" type="button" aria-label="내 프로필">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
@@ -41,6 +41,10 @@
           </svg>
         </button>
       </div>
+    </div>
+    <div class="mobile-actions">
+      <button type="button" aria-label="메뉴 열기" @click="isMenuOpen = !isMenuOpen">☰</button>
+      <button type="button" aria-label="내 프로필">♙</button>
     </div>
   </header>
 </template>
@@ -72,11 +76,11 @@ const navItems = [
 }
 
 .header-inner {
-  width: min(100% - 56px, 1608px);
+  width: min(calc(100% - 48px), var(--layout-max-width));
   height: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 270px 1fr 270px;
+  grid-template-columns: 260px 1fr 260px;
   align-items: center;
 }
 
@@ -86,7 +90,7 @@ const navItems = [
   gap: 12px;
   width: fit-content;
   color: var(--color-text);
-  font-size: 28px;
+  font-size: 27px;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
@@ -142,6 +146,12 @@ const navItems = [
 .main-nav a.router-link-exact-active::after {
   width: 48px;
 }
+
+.main-nav a.router-link-active:not([href='/']) {
+  color: var(--color-primary-deep);
+}
+
+.main-nav a.router-link-active:not([href='/'])::after { width: 48px; }
 
 .header-actions {
   display: flex;
@@ -201,6 +211,8 @@ const navItems = [
   background: currentColor;
 }
 
+.mobile-actions { display: none; }
+
 @media (max-width: 1000px) {
   .header-inner {
     grid-template-columns: 1fr auto auto;
@@ -255,6 +267,9 @@ const navItems = [
 
   .header-inner {
     width: min(100% - 32px, 1608px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
   }
 
   .brand-mark {
@@ -271,8 +286,38 @@ const navItems = [
     top: 66px;
   }
 
+  .menu-button {
+    display: none !important;
+  }
+
+  .header-actions {
+    display: none;
+  }
+
   .icon-button {
     display: none;
+  }
+
+  .mobile-actions {
+    position: fixed;
+    z-index: 100;
+    top: 13px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .mobile-actions button {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    cursor: pointer;
+    font-size: 19px;
   }
 }
 </style>

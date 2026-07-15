@@ -1,16 +1,8 @@
 <template>
   <footer class="app-footer" role="contentinfo">
     <div class="container">
-      <div class="footer-left">
-        <small>© 2026 Course On. All rights reserved.</small>
-      </div>
-
-      <div class="footer-links" aria-hidden="false">
-        <!-- 실제 페이지가 없으므로 버튼으로 표시 (임시) -->
-        <button type="button" class="footer-link" aria-disabled="true" title="임시">이용약관</button>
-        <button type="button" class="footer-link" aria-disabled="true" title="임시">개인정보처리방침</button>
-        <button type="button" class="footer-link" aria-disabled="true" title="임시">프로젝트 소개</button>
-      </div>
+      <small>© 2026 Course On. 서울 여행의 새로운 시작.</small>
+      <div class="footer-links"><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">프로젝트 소개</a></div>
     </div>
   </footer>
 </template>
@@ -35,12 +27,13 @@
   align-items: center;
 }
 
-.footer-link {
-  background: transparent;
-  border: 0;
+.footer-links { display: flex; gap: 18px; }
+.footer-links a {
   color: var(--color-text-secondary);
-  cursor: not-allowed;
   padding: 6px 8px;
   font-weight: 600;
+  font-size: 13px;
 }
+
+@media (max-width: 640px) { .container { flex-direction: column; gap: 12px; } }
 </style>

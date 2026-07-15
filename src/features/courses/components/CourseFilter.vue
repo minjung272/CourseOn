@@ -15,6 +15,7 @@ defineProps({
 })
 
 const emit = defineEmits(['update:keyword', 'toggle-tag', 'reset'])
+const tagIcons = { 데이트: '♥', 자연: '♧', 역사: '▣', 야경: '☾', 산책: '♧', 맛집: '♨', 문화예술: '◇', 도심여행: '⌂', 체험: '✦', 혼자: '●' }
 </script>
 
 <template>
@@ -44,7 +45,7 @@ const emit = defineEmits(['update:keyword', 'toggle-tag', 'reset'])
           :aria-pressed="selectedTags.includes(tag)"
           @click="emit('toggle-tag', tag)"
         >
-          {{ tag }}
+          <span aria-hidden="true">{{ tagIcons[tag] || '✦' }}</span>{{ tag }}
         </button>
       </div>
     </section>
@@ -55,6 +56,8 @@ const emit = defineEmits(['update:keyword', 'toggle-tag', 'reset'])
 
 <style scoped>
 .course-filter {
+  position: sticky;
+  top: 100px;
   border: 1px solid #e4e1f1;
   border-radius: 16px;
   background: #fff;
@@ -103,6 +106,9 @@ h2 {
   font-weight: 700;
 }
 
+.tag-button { display: flex; align-items: center; justify-content: center; gap: 7px; }
+.tag-button span { color: var(--color-primary); }
+
 .reset-button {
   width: calc(100% - 48px);
   margin: 20px 24px;
@@ -122,6 +128,7 @@ h2 {
 }
 
 @media (max-width: 760px) {
+  .course-filter { position: static; }
   .tag-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

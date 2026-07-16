@@ -137,6 +137,20 @@ function toPublicBoard(board) {
   }
 }
 
+function normalizePassword(value) {
+  const trimmed = String(value ?? '').trim()
+
+  if (!trimmed) {
+    throw new BoardApiError('비밀번호를 입력해주세요. 공백만 입력할 수 없습니다.', 'PASSWORD_REQUIRED', 400)
+  }
+
+  if (trimmed.length < 4 || trimmed.length > 20) {
+    throw new BoardApiError('비밀번호는 공백을 제외하고 4~20자로 입력해주세요.', 'INVALID_PASSWORD_FORMAT', 400)
+  }
+
+  return trimmed
+}
+
 export async function fetchBoards() {
   const boards = readBoards()
   return boards.map(toPublicBoard)
@@ -159,6 +173,8 @@ export async function fetchBoard(id, { incrementViews = true } = {}) {
 }
 
 export async function createBoard(board) {
+  const password = normalizePassword(board?.password)
+
   const boards = readBoards()
   const created = {
     id: Date.now(),
@@ -168,7 +184,7 @@ export async function createBoard(board) {
     content: board.content || '',
     tags: Array.isArray(board.tags) ? board.tags : [],
     imageUrl: board.imageUrl ?? null,
-    password: board.password || '',
+    password,
     views: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -180,6 +196,8 @@ export async function createBoard(board) {
 }
 
 export async function updateBoard(id, board) {
+  const password = normalizePassword(board?.password)
+
   const boards = readBoards()
   const target = boards.find((item) => item.id === Number(id))
 
@@ -187,7 +205,7 @@ export async function updateBoard(id, board) {
     throw new BoardApiError('게시글을 찾을 수 없습니다.', 'NOT_FOUND', 404)
   }
 
-  if (String(board.password || '') !== String(target.password || '')) {
+  if (String(password) !== String(target.password || '')) {
     throw new BoardApiError('비밀번호가 일치하지 않습니다.', 'INVALID_PASSWORD', 403)
   }
 
@@ -204,6 +222,8 @@ export async function updateBoard(id, board) {
 }
 
 export async function deleteBoard(id, password) {
+  const normalizedPassword = normalizePassword(password)
+
   const boards = readBoards()
   const index = boards.findIndex((item) => item.id === Number(id))
 
@@ -212,7 +232,7 @@ export async function deleteBoard(id, password) {
   }
 
   const target = boards[index]
-  if (String(password || '') !== String(target.password || '')) {
+  if (String(normalizedPassword) !== String(target.password || '')) {
     throw new BoardApiError('비밀번호가 일치하지 않습니다.', 'INVALID_PASSWORD', 403)
   }
 

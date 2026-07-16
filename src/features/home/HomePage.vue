@@ -23,17 +23,23 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import HeroBanner from './components/HeroBanner.vue'
 import CourseCard from './components/CourseCard.vue'
 import SeoulMapPanel from './components/SeoulMapPanel.vue'
 import TravelStats from './components/TravelStats.vue'
-import { featuredCourses } from '../../shared/data/demoContent'
+import { fetchCourses } from '../courses/services/courseService'
 
-const courses = [featuredCourses[1], featuredCourses[2], featuredCourses[0]].map((course, index) => ({
-  ...course,
-  rank: index + 1,
-  image: course.imageUrl,
-}))
+const courses = ref([])
+
+onMounted(async () => {
+  const loadedCourses = await fetchCourses()
+  courses.value = loadedCourses.slice(0, 3).map((course, index) => ({
+    ...course,
+    rank: index + 1,
+    image: course.imageUrl,
+  }))
+})
 </script>
 
 <style scoped>

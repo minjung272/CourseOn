@@ -1,5 +1,3 @@
-import { featuredCourses } from '../../../shared/data/demoContent'
-
 const COURSE_DATA_URL = '/data/courses/seoul.json'
 let cachedCourses = null
 
@@ -149,7 +147,7 @@ export async function fetchCourses() {
     ? data.courses.map(enrichCourse)
     : []
 
-  cachedCourses = [...featuredCourses.map(enrichCourse), ...normalizedCourses]
+  cachedCourses = normalizedCourses
 
   return cachedCourses
 }

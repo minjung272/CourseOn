@@ -36,7 +36,7 @@ onMounted(async () => {
 
   try {
     const loadedCourses = await fetchCourses()
-    courses.value = loadedCourses.filter((course) => !String(course.id).startsWith('demo-'))
+    courses.value = loadedCourses
   } catch (error) {
     errorMessage.value = error instanceof Error
       ? error.message

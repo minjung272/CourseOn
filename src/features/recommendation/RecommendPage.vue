@@ -2,7 +2,11 @@
 import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import tagMappings from './data/tagMappings.json'
-import { buildConditionQuery, parseConditions } from './services/recommendationService'
+import {
+  buildConditionQuery,
+  parseConditions,
+  saveRecommendationConditions,
+} from './services/recommendationService'
 
 const route = useRoute()
 const router = useRouter()
@@ -42,6 +46,7 @@ function select(group, value) {
 }
 
 function submit() {
+  saveRecommendationConditions(selections)
   router.push({ name: 'RecommendResult', query: buildConditionQuery(selections) })
 }
 </script>

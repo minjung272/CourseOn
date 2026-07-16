@@ -7,9 +7,9 @@ import ChatbotWidget from './components/ChatbotWidget.vue'
     <aside class="surface chat-intro">
       <span class="intro-icon">✦</span>
       <h1>Course On AI</h1>
-      <p>서울 25개 구의 여행 코스를<br>등록된 데이터에 근거해 추천해드려요.</p>
+      <p>서울의 다양한 여행 코스를<br>등록된 51개 데이터에 근거해 추천해드려요.</p>
       <dl>
-        <div><dt>지역으로 찾기</dt><dd>강서구, 강동구, 종로구 등</dd></div>
+        <div><dt>지역으로 찾기</dt><dd>데이터가 등록된 서울 지역</dd></div>
         <div><dt>테마로 찾기</dt><dd>산책, 야경, 역사, 맛집 등</dd></div>
         <div><dt>상황으로 찾기</dt><dd>데이트, 가족, 비 오는 날 등</dd></div>
       </dl>

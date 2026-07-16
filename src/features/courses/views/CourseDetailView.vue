@@ -79,10 +79,10 @@ function goToMap() {
   router.push({ name: 'Map', query: { course: course.value?.id } })
 }
 
-function goToRecommend() {
+function goToChatbot() {
   router.push({
-    name: 'Recommend',
-    query: { course: course.value?.id, theme: course.value?.tags[0] ?? '' },
+    name: 'Chatbot',
+    query: { courseId: course.value?.id },
   })
 }
 
@@ -268,8 +268,8 @@ onBeforeUnmount(() => {
               <span aria-hidden="true">{{ saved ? '♥' : '♡' }}</span>
               {{ saved ? '저장됨' : '저장하기' }}
             </button>
-            <button type="button" class="primary-button recommend-button" @click="goToRecommend">
-              <span aria-hidden="true">✦</span> 이 코스 추천받기
+            <button type="button" class="primary-button recommend-button" @click="goToChatbot">
+              <span aria-hidden="true">✦</span> AI에게 이 코스 물어보기
             </button>
           </div>
         </div>

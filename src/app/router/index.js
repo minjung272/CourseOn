@@ -1,4 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import {
+  buildConditionQuery,
+  loadRecommendationConditions,
+} from '../../features/recommendation/services/recommendationService'
 
 const routes = [
   { path: '/', name: 'Home', component: () => import('../../features/home/HomePage.vue') },
@@ -26,6 +30,19 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to) => {
+  if (to.name !== 'Recommend' || Object.keys(to.query).length > 0) return true
+
+  const savedConditions = loadRecommendationConditions()
+  if (!savedConditions) return true
+
+  return {
+    name: 'RecommendResult',
+    query: buildConditionQuery(savedConditions),
+    replace: true,
+  }
 })
 
 export default router

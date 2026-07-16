@@ -2,7 +2,6 @@
   <div class="home-page">
     <div class="home-container">
       <HeroBanner />
-      <SearchPanel />
 
       <section class="popular-section" aria-labelledby="popular-title">
         <div class="section-heading">
@@ -25,7 +24,6 @@
 
 <script setup>
 import HeroBanner from './components/HeroBanner.vue'
-import SearchPanel from './components/SearchPanel.vue'
 import CourseCard from './components/CourseCard.vue'
 import SeoulMapPanel from './components/SeoulMapPanel.vue'
 import TravelStats from './components/TravelStats.vue'

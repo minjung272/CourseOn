@@ -4,9 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { fetchCourses } from '../courses/services/courseService'
 import {
   buildConditionQuery,
+  clearRecommendationConditions,
   getConditionSummary,
+  loadRecommendationConditions,
   parseConditions,
   rankCourses,
+  saveRecommendationConditions,
 } from './services/recommendationService'
 
 const route = useRoute()
@@ -15,7 +18,12 @@ const courses = ref([])
 const loading = ref(true)
 const errorMessage = ref('')
 
-const conditions = computed(() => parseConditions(route.query))
+const conditions = computed(() => {
+  const hasQueryConditions = Object.keys(buildConditionQuery(parseConditions(route.query))).length > 0
+  return hasQueryConditions
+    ? parseConditions(route.query)
+    : loadRecommendationConditions() ?? parseConditions(route.query)
+})
 const selected = computed(() => Object.fromEntries(
   getConditionSummary(conditions.value).map(({ label, value }) => [label, value]),
 ))
@@ -24,6 +32,8 @@ const topCourses = computed(() => recommendation.value.courses.slice(0, 3))
 const additionalCourses = computed(() => recommendation.value.courses.slice(3, 7))
 
 onMounted(async () => {
+  saveRecommendationConditions(conditions.value)
+
   try {
     const loadedCourses = await fetchCourses()
     courses.value = loadedCourses.filter((course) => !String(course.id).startsWith('demo-'))
@@ -37,6 +47,7 @@ onMounted(async () => {
 })
 
 function editConditions() {
+  clearRecommendationConditions()
   router.push({ name: 'Recommend', query: buildConditionQuery(conditions.value) })
 }
 

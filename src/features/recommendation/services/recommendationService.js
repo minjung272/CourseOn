@@ -1,5 +1,7 @@
 import tagMappings from '../data/tagMappings.json' with { type: 'json' }
 
+const RECOMMENDATION_STORAGE_KEY = 'course-on:recommendation-conditions'
+
 const GROUP_META = [
   { key: 'companion', label: '동행', multiple: false },
   { key: 'interests', label: '관심사', multiple: true },
@@ -51,6 +53,32 @@ export function buildConditionQuery(conditions) {
 
     return query
   }, {})
+}
+
+export function saveRecommendationConditions(conditions) {
+  if (typeof localStorage === 'undefined') return
+  localStorage.setItem(
+    RECOMMENDATION_STORAGE_KEY,
+    JSON.stringify(buildConditionQuery(conditions)),
+  )
+}
+
+export function loadRecommendationConditions() {
+  if (typeof localStorage === 'undefined') return null
+
+  try {
+    const savedQuery = JSON.parse(localStorage.getItem(RECOMMENDATION_STORAGE_KEY) ?? 'null')
+    return savedQuery && typeof savedQuery === 'object'
+      ? parseConditions(savedQuery)
+      : null
+  } catch {
+    return null
+  }
+}
+
+export function clearRecommendationConditions() {
+  if (typeof localStorage === 'undefined') return
+  localStorage.removeItem(RECOMMENDATION_STORAGE_KEY)
 }
 
 function getSelectedIds(group, conditions) {

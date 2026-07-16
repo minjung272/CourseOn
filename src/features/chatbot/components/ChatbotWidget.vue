@@ -1,6 +1,7 @@
 <script setup>
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { fetchCourseById } from '../../courses/services/courseService'
 
 const props = defineProps({ embedded: { type: Boolean, default: false } })
 const route = useRoute()
@@ -8,6 +9,8 @@ const isOpen = ref(false)
 const input = ref('')
 const loading = ref(false)
 const messagesEl = ref(null)
+const selectedCourse = ref(null)
+const autoSentCourseId = ref('')
 const suggestions = ['강서구 산책 코스 추천해줘', '강동구 야경 코스 알려줘', '비 오는 날 실내 코스 알려줘', '아이와 가기 좋은 코스 추천해줘']
 const messages = ref([
   { role: 'assistant', content: '안녕하세요! Course On AI 여행 도우미예요. 😊\n서울의 지역이나 원하는 테마를 말씀해주세요.' },
@@ -15,6 +18,27 @@ const messages = ref([
 
 const shouldRender = computed(() => props.embedded || route.name !== 'Chatbot')
 const panelVisible = computed(() => props.embedded || isOpen.value)
+
+watch(
+  () => route.query.courseId,
+  async (courseId) => {
+    const normalizedCourseId = Array.isArray(courseId) ? courseId[0] : courseId
+    selectedCourse.value = normalizedCourseId
+      ? await fetchCourseById(normalizedCourseId).catch(() => null)
+      : null
+
+    if (!selectedCourse.value) return
+
+    const prompt = `${selectedCourse.value.title} 코스의 특징을 알려주고, 비슷한 코스도 추천해줘`
+    if (!input.value.trim()) input.value = prompt
+
+    if (props.embedded && autoSentCourseId.value !== String(selectedCourse.value.id)) {
+      autoSentCourseId.value = String(selectedCourse.value.id)
+      await send(prompt)
+    }
+  },
+  { immediate: true },
+)
 
 async function scrollToBottom() {
   await nextTick()
@@ -80,6 +104,22 @@ async function send(message = input.value) {
           <button v-if="!embedded" type="button" aria-label="챗봇 닫기" @click="isOpen = false">×</button>
         </header>
 
+        <RouterLink
+          v-if="selectedCourse"
+          class="selected-course-context"
+          :to="`/courses/${selectedCourse.id}`"
+          aria-label="선택한 코스 상세로 돌아가기"
+        >
+          <img v-if="selectedCourse.imageUrl" :src="selectedCourse.imageUrl" :alt="selectedCourse.title">
+          <span v-else class="course-placeholder">서울</span>
+          <span>
+            <small>선택한 코스</small>
+            <strong>{{ selectedCourse.title }}</strong>
+            <em>{{ selectedCourse.districtName }} · {{ selectedCourse.tags?.slice(0, 3).join(' · ') }}</em>
+          </span>
+          <b>›</b>
+        </RouterLink>
+
         <div class="suggestion-strip">
           <button v-for="suggestion in suggestions" :key="suggestion" type="button" :disabled="loading" @click="send(suggestion)">{{ suggestion }}</button>
         </div>
@@ -117,6 +157,7 @@ async function send(message = input.value) {
 <style scoped>
 .chatbot-widget { position: fixed; z-index: 1200; right: 28px; bottom: 28px; }.chatbot-launcher { height: 58px; padding: 0 20px; display: flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; color: white; background: linear-gradient(135deg, #8064ff, #6040dc); box-shadow: 0 14px 35px rgba(89, 62, 203, .32); cursor: pointer; }.chatbot-launcher span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.18); font-size: 20px; }.chatbot-launcher b { font-size: 14px; }
 .chatbot-panel { width: min(410px, calc(100vw - 28px)); height: min(650px, calc(100vh - 110px)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ddd7f8; border-radius: 20px; background: #fff; box-shadow: 0 20px 55px rgba(48, 34, 102, .25); }.chatbot-panel > header { min-height: 76px; padding: 13px 16px; display: flex; align-items: center; gap: 11px; color: white; background: linear-gradient(135deg, #7e61f5, #6545dc); }.bot-avatar, .mini-avatar { flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; }.bot-avatar { width: 44px; height: 44px; background: rgba(255,255,255,.18); font-size: 22px; }.chatbot-panel header div { flex: 1; }.chatbot-panel header strong, .chatbot-panel header small { display: block; }.chatbot-panel header small { margin-top: 4px; color: #eeeaff; font-size: 11px; }.chatbot-panel header small i { width: 7px; height: 7px; margin-right: 5px; display: inline-block; border-radius: 50%; background: #72eda2; }.chatbot-panel header > button { border: 0; color: white; background: transparent; cursor: pointer; font-size: 27px; }
+.selected-course-context { margin: 10px 12px 0; padding: 8px; display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 10px; border: 1px solid #dcd4ff; border-radius: 12px; color: inherit; background: #faf9ff; }.selected-course-context img, .selected-course-context > .course-placeholder { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; }.selected-course-context > span:nth-child(2) { min-width: 0; }.selected-course-context small, .selected-course-context strong, .selected-course-context em { display: block; }.selected-course-context small { margin-bottom: 3px; color: var(--color-primary); font-size: 9px; font-weight: 750; }.selected-course-context strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }.selected-course-context em { margin-top: 4px; overflow: hidden; color: var(--color-text-secondary); font-size: 9px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }.selected-course-context b { color: var(--color-primary); font-size: 18px; }
 .suggestion-strip { padding: 10px 12px; display: flex; gap: 7px; overflow-x: auto; border-bottom: 1px solid var(--color-border-soft); scrollbar-width: none; }.suggestion-strip button { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #d7cffc; border-radius: 999px; color: #6652b5; background: #faf9ff; cursor: pointer; font-size: 11px; }.suggestion-strip button:disabled { opacity: .55; }
 .chatbot-messages { flex: 1; padding: 16px 14px; overflow-y: auto; background: #fafaff; }.chat-message { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px; }.chat-message.user { justify-content: flex-end; }.mini-avatar { width: 30px; height: 30px; color: var(--color-primary); background: var(--color-primary-soft); font-size: 13px; }.message-body { max-width: 86%; }.chat-message p { width: fit-content; margin: 0; padding: 10px 12px; border: 1px solid #e5e1f5; border-radius: 4px 14px 14px; background: white; white-space: pre-line; line-height: 1.55; font-size: 13px; }.chat-message.user p { border: 0; border-radius: 14px 4px 14px 14px; color: #2d2850; background: #eae4ff; }.chat-message.error p { color: #a33a42; border-color: #f0c9cc; background: #fff5f5; }
 .result-courses { margin-top: 7px; display: grid; gap: 6px; }.result-courses a { min-height: 68px; padding: 7px; display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 9px; border: 1px solid #e2ddf8; border-radius: 10px; color: inherit; background: white; }.result-courses img, .course-placeholder { width: 76px; height: 54px; object-fit: cover; border-radius: 7px; }.course-placeholder { display: grid; place-items: center; color: #7560d9; background: var(--color-primary-pale); font-size: 11px; }.result-courses strong { display: block; font-size: 12px; }.result-courses small { margin-top: 5px; display: block; color: var(--color-text-secondary); font-size: 10px; }.result-courses b { color: var(--color-primary); font-size: 18px; }

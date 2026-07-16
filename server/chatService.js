@@ -30,6 +30,14 @@ const THEME_EXPANSIONS = {
   맛집: ['맛집', '도심여행'],
 }
 
+const DISTRICT_NAMES = [...new Set(Object.values(DISTRICT_BY_AREA_CODE))]
+const TRAVEL_TOPIC_KEYWORDS = [
+  '서울', '여행', '코스', '관광', '명소', '산책', '야경', '맛집', '역사',
+  '문화', '자연', '체험', '데이트', '힐링', '사진', '카페', '나들이',
+]
+const DISTRICT_RESET_PATTERN = /(지역\s*상관\s*없|아무\s*지역|서울\s*전체|전체\s*지역)/
+const DISTRICT_FOLLOW_UP_PATTERN = /(그중|그\s*중|거기|그곳|그쪽|해당\s*지역|그\s*지역)/
+
 export const SYSTEM_PROMPT = `당신은 서울 여행 서비스 Course On의 친절하고 정확한 한국어 여행 도우미입니다.
 
 반드시 지킬 규칙:
@@ -58,6 +66,40 @@ function normalize(value = '') {
   return value.toLowerCase().replace(/[^0-9a-z가-힣\s]/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
+function extractDistrict(value = '') {
+  const normalized = normalize(value)
+  return DISTRICT_NAMES.find((name) => normalized.includes(name)) || null
+}
+
+export function isTravelQuestion(question = '') {
+  const normalized = normalize(question)
+  return DISTRICT_NAMES.some((name) => normalized.includes(name))
+    || TRAVEL_TOPIC_KEYWORDS.some((keyword) => normalized.includes(keyword))
+}
+
+export function resolveRequestedDistrict(message, history = []) {
+  const normalizedMessage = normalize(message)
+  if (DISTRICT_RESET_PATTERN.test(normalizedMessage)) return null
+
+  const currentDistrict = extractDistrict(message)
+  if (currentDistrict) return currentDistrict
+
+  // 새 여행 요청에 지역이 없으면 서울 전체를 대상으로 검색한다.
+  // 이전 지역은 "그중", "그 지역"처럼 후속 질문임이 명확할 때만 유지한다.
+  if (!DISTRICT_FOLLOW_UP_PATTERN.test(normalizedMessage)) return null
+
+  if (!Array.isArray(history)) return null
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    const historyMessage = history[index]
+    if (historyMessage?.role !== 'user' || typeof historyMessage.content !== 'string') continue
+    if (DISTRICT_RESET_PATTERN.test(normalize(historyMessage.content))) return null
+    const district = extractDistrict(historyMessage.content)
+    if (district) return district
+  }
+
+  return null
+}
+
 function queryTerms(question) {
   const normalized = normalize(question)
   const terms = normalized.split(' ').filter((term) => term.length > 1 && !STOP_WORDS.has(term))
@@ -81,18 +123,24 @@ function compactCourse(course) {
   }
 }
 
-export function selectRelevantCourses(courses, question, limit = 8) {
-  const { normalized, terms } = queryTerms(question)
-  const districtMention = Object.values(DISTRICT_BY_AREA_CODE).find((name) => normalized.includes(name))
+export function selectRelevantCourses(courses, question, limit = 8, options = {}) {
+  if (!isTravelQuestion(question)) return []
 
-  const scored = courses.map((course, index) => {
+  const { normalized, terms } = queryTerms(question)
+  const districtMention = options.district || extractDistrict(normalized)
+  const sourceCourses = districtMention
+    ? courses.filter((course) => getDistrictName(course) === districtMention)
+    : courses
+
+  if (sourceCourses.length === 0) return []
+
+  const scored = sourceCourses.map((course, index) => {
     const district = getDistrictName(course)
     const title = normalize(course.title)
     const tags = normalize((course.tags || []).join(' '))
     let score = 0
 
-    if (districtMention && district === districtMention) score += 30
-    if (normalized.includes(district)) score += 20
+    if (!districtMention && normalized.includes(district)) score += 20
     terms.forEach((term) => {
       if (title.includes(term)) score += 7
       if (tags.includes(term)) score += 9
@@ -109,7 +157,7 @@ export function selectRelevantCourses(courses, question, limit = 8) {
   const usedDistricts = new Set()
 
   for (const item of pool) {
-    if (!usedDistricts.has(item.district) || selected.length < Math.min(3, limit)) {
+    if (districtMention || !usedDistricts.has(item.district) || selected.length < Math.min(3, limit)) {
       selected.push(compactCourse(item.course))
       usedDistricts.add(item.district)
     }
@@ -184,7 +232,22 @@ function responseRequest({ model, input, maxOutputTokens }) {
 
 export async function generateChatResponse({ client, model, message, history, courses }) {
   const casual = isCasualMessage(message)
-  const selectedCourses = casual ? [] : selectRelevantCourses(courses, message)
+  const travelQuestion = !casual && isTravelQuestion(message)
+  const requestedDistrict = travelQuestion ? resolveRequestedDistrict(message, history) : null
+  const districtCourses = requestedDistrict
+    ? courses.filter((course) => getDistrictName(course) === requestedDistrict)
+    : courses
+
+  if (requestedDistrict && districtCourses.length === 0) {
+    return {
+      answer: `현재 등록된 여행코스 중 ${requestedDistrict} 데이터가 없습니다. 다른 지역이나 원하는 여행 테마를 알려주시면 다시 찾아드릴게요.`,
+      courses: [],
+    }
+  }
+
+  const selectedCourses = casual || !travelQuestion
+    ? []
+    : selectRelevantCourses(courses, message, 8, { district: requestedDistrict })
   const input = [
     ...sanitizeHistory(history),
     {

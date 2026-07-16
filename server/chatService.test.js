@@ -14,6 +14,51 @@ test('질문에 언급된 구와 테마를 우선 선별한다', () => {
   assert.equal(result[0].district, '강서구')
 })
 
+test('여행과 무관한 질문에는 코스 후보를 반환하지 않는다', () => {
+  assert.deepEqual(selectRelevantCourses(courses, '1+1은 뭐야?'), [])
+  assert.deepEqual(selectRelevantCourses(courses, '영화 추천해줘'), [])
+})
+
+test('후속 질문에서는 직전 사용자 질문의 지역을 유지한다', async () => {
+  const client = { responses: { create: async () => ({ output_text: '종로구 산책 코스를 안내할게요.' }) } }
+  const result = await generateChatResponse({
+    client,
+    model: 'test-model',
+    message: '그중 산책은?',
+    history: [
+      { role: 'user', content: '종로구 역사 코스 추천해줘' },
+      { role: 'assistant', content: '종로구 코스를 추천해드릴게요.' },
+    ],
+    courses,
+  })
+
+  assert.ok(result.courses.length > 0)
+  assert.ok(result.courses.every(({ district }) => district === '종로구'))
+})
+
+test('이전 지역에 데이터가 없어도 새 질문에 지역이 없으면 서울 전체에서 다시 찾는다', async () => {
+  let called = false
+  const client = { responses: { create: async () => {
+    called = true
+    return { output_text: '비 오는 날 방문하기 좋은 코스를 안내할게요.' }
+  } } }
+  const result = await generateChatResponse({
+    client,
+    model: 'test-model',
+    message: '비 오는 날 실내 코스 알려줘',
+    history: [
+      { role: 'user', content: '강동구 야경 코스 알려줘' },
+      { role: 'assistant', content: '현재 등록된 여행코스 중 강동구 데이터가 없습니다.' },
+    ],
+    courses,
+  })
+
+  assert.equal(called, true)
+  assert.ok(result.courses.length > 0)
+  assert.ok(result.courses.some(({ district }) => district !== '강동구'))
+  assert.doesNotMatch(result.answer, /강동구 데이터가 없습니다/)
+})
+
 test('Responses API에 시스템 지침과 선별 데이터만 전달한다', async () => {
   let request
   const client = { responses: { create: async (payload) => {

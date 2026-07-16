@@ -16,16 +16,11 @@ const boardDataFile = process.env.BOARD_DATA_FILE
   : path.join(rootDir, 'server/data/boards.json')
 let courseCache
 
-async function loadCourses() {
+export async function loadCourses() {
   if (courseCache) return courseCache
   const raw = await readFile(path.join(rootDir, 'public/data/courses/seoul.json'), 'utf8')
   const parsed = JSON.parse(raw)
-  const districtRaw = await readFile(path.join(rootDir, 'src/shared/data/districtCourses.json'), 'utf8')
-  const districtCourses = JSON.parse(districtRaw).map((course) => ({
-    ...course,
-    region: { code: '1', name: '서울', districtCode: course.district },
-  }))
-  courseCache = [...districtCourses, ...(Array.isArray(parsed.courses) ? parsed.courses : [])]
+  courseCache = Array.isArray(parsed.courses) ? parsed.courses : []
   return courseCache
 }
 

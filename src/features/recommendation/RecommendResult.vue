@@ -39,6 +39,10 @@ onMounted(async () => {
 function editConditions() {
   router.push({ name: 'Recommend', query: buildConditionQuery(conditions.value) })
 }
+
+function goToCourseDetail(course) {
+  router.push({ name: 'CourseDetail', params: { courseId: course.id } })
+}
 </script>
 
 <template>
@@ -57,7 +61,16 @@ function editConditions() {
           조건과 일치하는 태그가 없어 전체 코스를 기본 순서대로 보여드려요.
         </p>
         <div class="top-grid">
-          <article v-for="(course, index) in topCourses" :key="course.id" class="result-card">
+          <article
+            v-for="(course, index) in topCourses"
+            :key="course.id"
+            class="result-card"
+            role="link"
+            tabindex="0"
+            :aria-label="`${course.title} 상세보기`"
+            @click="goToCourseDetail(course)"
+            @keydown.enter="goToCourseDetail(course)"
+          >
             <div class="result-image">
               <img v-if="course.imageUrl" :src="course.imageUrl" :alt="`${course.title} 대표 이미지`">
               <div v-else class="result-placeholder">이미지 준비 중</div>
@@ -73,17 +86,25 @@ function editConditions() {
                 </template>
               </small>
               <div><span v-for="tag in course.tags" :key="tag" class="tag-chip">#{{ tag }}</span></div>
-              <RouterLink class="outline-button" :to="`/courses/${course.id}`">상세보기 →</RouterLink>
+              <span class="outline-button detail-link">상세보기 →</span>
             </div>
           </article>
         </div>
         <div v-if="additionalCourses.length" class="more-section">
           <h2>이런 코스는 어때요?</h2>
           <div class="mini-grid">
-            <article v-for="course in additionalCourses" :key="course.id">
+            <article
+              v-for="course in additionalCourses"
+              :key="course.id"
+              role="link"
+              tabindex="0"
+              :aria-label="`${course.title} 상세보기`"
+              @click="goToCourseDetail(course)"
+              @keydown.enter="goToCourseDetail(course)"
+            >
               <img v-if="course.imageUrl" :src="course.imageUrl" :alt="`${course.title} 대표 이미지`">
               <div v-else class="mini-placeholder">이미지 준비 중</div>
-              <div><strong>{{ course.title }}</strong><p>추천 점수 {{ course.recommendation.score }}점</p><RouterLink :to="`/courses/${course.id}`">→</RouterLink></div>
+              <div><strong>{{ course.title }}</strong><p>추천 점수 {{ course.recommendation.score }}점</p><span class="mini-detail-link">→</span></div>
             </article>
           </div>
         </div>
@@ -106,7 +127,9 @@ function editConditions() {
 .result-panel > header h1 { margin: 0; font-size: 23px; }
 .result-panel > header a { color: var(--color-primary); font-weight: 700; }
 .top-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.result-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: 14px; }
+.result-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: 14px; cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.result-card:hover { border-color: var(--color-primary); box-shadow: 0 8px 22px rgba(92, 66, 196, .12); transform: translateY(-2px); }
+.result-card:focus-visible, .mini-grid article:focus-visible { outline: 3px solid rgba(117, 89, 237, .35); outline-offset: 3px; }
 .result-image { height: 190px; position: relative; }
 .result-image img { width: 100%; height: 100%; object-fit: cover; }
 .result-placeholder { width: 100%; height: 100%; display: grid; place-items: center; color: #817a9a; background: linear-gradient(135deg, #eeeaff, #f7f6fb); }
@@ -117,13 +140,15 @@ function editConditions() {
 .result-body small { color: #717487; }
 .result-body > div { margin: 16px 0; display: flex; flex-wrap: wrap; gap: 7px; }
 .result-body .outline-button { min-height: 40px; float: right; }
+.result-body .detail-link { display: inline-flex; }
 .more-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border); }
 .more-section h2 { font-size: 19px; }
 .mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.mini-grid article { padding: 10px; display: grid; grid-template-columns: 86px 1fr; gap: 10px; border: 1px solid var(--color-border); border-radius: 11px; }
+.mini-grid article { padding: 10px; display: grid; grid-template-columns: 86px 1fr; gap: 10px; border: 1px solid var(--color-border); border-radius: 11px; cursor: pointer; }
+.mini-grid article:hover { border-color: var(--color-primary); background: var(--color-primary-pale); }
 .mini-grid img { width: 86px; height: 86px; object-fit: cover; border-radius: 8px; }
 .mini-placeholder { width: 86px; height: 86px; display: grid; place-items: center; border-radius: 8px; color: #817a9a; background: #f2efff; font-size: 11px; }
-.mini-grid strong { font-size: 13px; }.mini-grid p { margin: 6px 0; color: var(--color-text-secondary); font-size: 11px; }.mini-grid a { color: var(--color-primary); }
+.mini-grid strong { font-size: 13px; }.mini-grid p { margin: 6px 0; color: var(--color-text-secondary); font-size: 11px; }.mini-detail-link { color: var(--color-primary); font-weight: 750; }
 .status-message { min-height: 380px; display: grid; place-items: center; color: var(--color-text-secondary); }
 .status-message.error { color: #b23a3a; }
 .fallback-notice { margin: 20px 0 0; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 9px; color: var(--color-text-secondary); background: var(--color-primary-pale); }

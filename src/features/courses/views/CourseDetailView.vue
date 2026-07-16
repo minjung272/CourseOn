@@ -3,7 +3,6 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import fallbackImage from '../../../assets/images/hero-seoul.jpg'
 import { fetchCourseById, fetchRelatedCourses } from '../services/courseService'
 
 const props = defineProps({
@@ -29,10 +28,6 @@ const SAVED_COURSE_KEY = 'course-on:saved-course-ids'
 let map
 let noticeTimer
 let loadSequence = 0
-
-const heroImage = computed(() =>
-  course.value?.imageUrl && !imageFailed.value ? course.value.imageUrl : fallbackImage,
-)
 
 const mainTheme = computed(() => course.value?.tags.slice(0, 2).join(', ') || '서울여행')
 
@@ -212,12 +207,21 @@ onBeforeUnmount(() => {
       <section class="course-hero surface">
         <div class="course-image-wrap">
           <img
+            v-if="course.imageUrl && !imageFailed"
             class="course-image"
-            :src="heroImage"
+            :src="course.imageUrl"
             :alt="course.imageAlt || `${course.title} 대표 이미지`"
             @error="imageFailed = true"
           />
-          <span class="image-count" aria-label="대표 이미지 1장">1 / 1</span>
+          <div
+            v-else
+            class="course-image-placeholder"
+            role="img"
+            :aria-label="`${course.title} 이미지 없음`"
+          >
+            이미지 준비 중
+          </div>
+          <span v-if="course.imageUrl && !imageFailed" class="image-count" aria-label="대표 이미지 1장">1 / 1</span>
         </div>
 
         <div class="course-summary">
@@ -388,17 +392,35 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="related-grid">
-          <article v-for="related in relatedCourses" :key="related.id" class="related-card">
+          <article
+            v-for="related in relatedCourses"
+            :key="related.id"
+            class="related-card"
+            role="link"
+            tabindex="0"
+            :aria-label="`${related.title} 상세보기`"
+            @click="goToRelatedCourse(related.id)"
+            @keydown.enter="goToRelatedCourse(related.id)"
+          >
             <img
-              :src="failedRelatedImages.has(String(related.id)) ? fallbackImage : (related.imageUrl || fallbackImage)"
+              v-if="related.imageUrl && !failedRelatedImages.has(String(related.id))"
+              :src="related.imageUrl"
               :alt="related.imageAlt || `${related.title} 대표 이미지`"
               @error="markRelatedImageFailed(related.id)"
             />
+            <div
+              v-else
+              class="related-image-placeholder"
+              role="img"
+              :aria-label="`${related.title} 이미지 없음`"
+            >
+              이미지 준비 중
+            </div>
             <div>
               <p>{{ related.districtName }}</p>
               <h3>{{ related.title }}</h3>
               <span v-for="tag in related.tags.slice(0, 3)" :key="tag">#{{ tag }}</span>
-              <button type="button" :aria-label="`${related.title} 상세보기`" @click="goToRelatedCourse(related.id)">상세보기 →</button>
+              <span class="related-detail-link">상세보기 →</span>
             </div>
           </article>
         </div>
@@ -443,11 +465,26 @@ onBeforeUnmount(() => {
   background: #f1eff8;
 }
 
-.course-image {
+.course-image,
+.course-image-placeholder {
   width: 100%;
   height: 100%;
+}
+
+.course-image {
   object-fit: cover;
 }
+
+.course-image-placeholder,
+.related-image-placeholder {
+  display: grid;
+  place-items: center;
+  color: #817a9a;
+  background: linear-gradient(135deg, #eeeaff, #f7f6fb);
+  text-align: center;
+}
+
+.course-image-placeholder { min-height: 410px; font-size: 16px; }
 
 .image-count {
   position: absolute;
@@ -688,13 +725,18 @@ onBeforeUnmount(() => {
 .related-section { margin-top: 20px; }
 .related-heading { align-items: center; }
 .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
-.related-card { min-width: 0; overflow: hidden; display: grid; grid-template-columns: 150px minmax(0, 1fr); border: 1px solid var(--color-border); border-radius: 13px; }
-.related-card img { width: 150px; height: 100%; min-height: 155px; object-fit: cover; }
+.related-card { min-width: 0; overflow: hidden; display: grid; grid-template-columns: 150px minmax(0, 1fr); border: 1px solid var(--color-border); border-radius: 13px; cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.related-card:hover { border-color: var(--color-primary); box-shadow: 0 8px 22px rgba(92, 66, 196, .12); transform: translateY(-2px); }
+.related-card:focus-visible { outline: 3px solid rgba(117, 89, 237, .35); outline-offset: 3px; }
+.related-card img,
+.related-image-placeholder { width: 150px; height: 100%; min-height: 155px; }
+.related-card img { object-fit: cover; }
+.related-image-placeholder { font-size: 12px; }
 .related-card > div { min-width: 0; padding: 16px; }
 .related-card p { margin: 0 0 7px; color: var(--color-primary); font-size: 12px; font-weight: 750; }
 .related-card h3 { margin: 0 0 12px; overflow: hidden; display: -webkit-box; font-size: 15px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .related-card span { margin-right: 4px; padding: 4px 6px; font-size: 10px; }
-.related-card button { margin-top: 14px; padding: 0; border: 0; color: var(--color-primary-deep); background: transparent; font-size: 12px; font-weight: 750; cursor: pointer; }
+.related-detail-link { margin-top: 14px; display: block; color: var(--color-primary-deep); font-size: 12px; font-weight: 750; }
 
 .status-card { min-height: 440px; padding: 60px 20px; display: grid; place-items: center; align-content: center; text-align: center; }
 .status-card h1 { margin: 18px 0 7px; font-size: 24px; }
@@ -720,21 +762,21 @@ onBeforeUnmount(() => {
   .course-metadata div:nth-child(3) { padding-left: 0; border-left: 0; }
   .detail-grid { grid-template-columns: 1fr; }
   .related-card { grid-template-columns: 120px minmax(0, 1fr); }
-  .related-card img { width: 120px; }
+  .related-card img, .related-image-placeholder { width: 120px; }
 }
 
 @media (max-width: 900px) {
   .course-hero { grid-template-columns: 1fr; }
-  .course-image-wrap { min-height: 340px; }
+  .course-image-wrap, .course-image-placeholder { min-height: 340px; }
   .related-grid { grid-template-columns: 1fr; }
   .related-card { grid-template-columns: 180px minmax(0, 1fr); }
-  .related-card img { width: 180px; }
+  .related-card img, .related-image-placeholder { width: 180px; }
 }
 
 @media (max-width: 640px) {
   .breadcrumb { margin-bottom: 12px; font-size: 12px; }
   .course-hero, .content-panel, .map-panel, .related-section { padding: 15px; }
-  .course-image-wrap { min-height: 250px; }
+  .course-image-wrap, .course-image-placeholder { min-height: 250px; }
   .course-summary { padding: 8px 2px 2px; }
   .course-summary h1 { font-size: 28px; }
   .summary-description br { display: none; }
@@ -748,7 +790,7 @@ onBeforeUnmount(() => {
   .detail-map { height: 270px; }
   .related-heading { align-items: flex-end; }
   .related-card { grid-template-columns: 112px minmax(0, 1fr); }
-  .related-card img { width: 112px; }
+  .related-card img, .related-image-placeholder { width: 112px; }
   .related-card > div { padding: 13px; }
   .save-notice { right: 16px; bottom: 16px; left: 16px; text-align: center; }
 }

@@ -13,7 +13,9 @@
     "test": "node --test server/*.test.js",
     "test:recommendation": "node --test src/features/recommendation/services/recommendationService.test.js",
     "test:local-profile": "node --test src/features/profile/services/profileService.test.js src/features/courses/services/savedCourseService.test.js",
-    "test:map": "node --test src/features/map/services/mapCourseService.test.js"
+    "test:map": "node --test src/features/map/services/mapCourseService.test.js",
+    "test:qa": "node --test tests/project-data.qa.test.js tests/project-contract.qa.test.js src/features/community/services/boardService.test.js",
+    "test:all": "npm test && npm run test:recommendation && npm run test:map && npm run test:local-profile && npm run test:qa"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

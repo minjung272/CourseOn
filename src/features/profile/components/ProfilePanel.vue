@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import { fetchCourseById } from '../../courses/services/courseService'
-import { getSavedCourseIds } from '../../courses/services/savedCourseService'
+import { clearSavedCourses, getSavedCourseIds } from '../../courses/services/savedCourseService'
 import { clearLocalProfile, getLocalProfile, saveLocalProfile } from '../services/profileService'
 
 const props = defineProps({ open: { type: Boolean, default: false } })
@@ -46,9 +46,11 @@ function saveProfile() {
 
 function clearProfile() {
   clearLocalProfile()
+  clearSavedCourses()
   form.name = ''
   form.password = ''
-  message.value = '프로필을 초기화했어요.'
+  savedCourses.value = []
+  message.value = '프로필과 저장한 코스를 초기화했어요.'
   errorMessage.value = ''
   emit('profile-updated', null)
 }

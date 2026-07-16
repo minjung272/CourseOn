@@ -1,7 +1,13 @@
 const SAVED_COURSE_KEY = 'course-on:saved-course-ids'
+export const SAVED_COURSES_CHANGED_EVENT = 'course-on:saved-courses-changed'
 
 function getStorage() {
   return typeof localStorage === 'undefined' ? null : localStorage
+}
+
+function notifySavedCoursesChanged() {
+  if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return
+  window.dispatchEvent(new Event(SAVED_COURSES_CHANGED_EVENT))
 }
 
 export function getSavedCourseIds() {
@@ -29,5 +35,11 @@ export function toggleSavedCourse(courseId) {
   else savedIds.delete(normalizedId)
 
   getStorage()?.setItem(SAVED_COURSE_KEY, JSON.stringify([...savedIds]))
+  notifySavedCoursesChanged()
   return willBeSaved
+}
+
+export function clearSavedCourses() {
+  getStorage()?.removeItem(SAVED_COURSE_KEY)
+  notifySavedCoursesChanged()
 }

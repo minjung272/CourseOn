@@ -1,6 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-import { isCourseSaved, toggleSavedCourse } from '../services/savedCourseService'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import {
+  isCourseSaved,
+  SAVED_COURSES_CHANGED_EVENT,
+  toggleSavedCourse,
+} from '../services/savedCourseService'
 
 const props = defineProps({
   course: {
@@ -13,9 +17,16 @@ const emit = defineEmits(['select'])
 const imageFailed = ref(false)
 const saved = ref(isCourseSaved(props.course.id))
 
+function syncSavedState() {
+  saved.value = isCourseSaved(props.course.id)
+}
+
 function toggleSave() {
   saved.value = toggleSavedCourse(props.course.id)
 }
+
+onMounted(() => window.addEventListener(SAVED_COURSES_CHANGED_EVENT, syncSavedState))
+onBeforeUnmount(() => window.removeEventListener(SAVED_COURSES_CHANGED_EVENT, syncSavedState))
 </script>
 
 <template>

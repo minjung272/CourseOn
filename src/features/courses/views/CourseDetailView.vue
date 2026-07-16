@@ -1,10 +1,14 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { fetchCourseById, fetchRelatedCourses } from '../services/courseService'
-import { isCourseSaved, toggleSavedCourse } from '../services/savedCourseService'
+import {
+  isCourseSaved,
+  SAVED_COURSES_CHANGED_EVENT,
+  toggleSavedCourse,
+} from '../services/savedCourseService'
 
 const props = defineProps({
   courseId: {
@@ -155,9 +159,12 @@ watch(
   { immediate: true },
 )
 
+onMounted(() => window.addEventListener(SAVED_COURSES_CHANGED_EVENT, syncSavedState))
+
 onBeforeUnmount(() => {
   map?.remove()
   window.clearTimeout(noticeTimer)
+  window.removeEventListener(SAVED_COURSES_CHANGED_EVENT, syncSavedState)
 })
 </script>
 

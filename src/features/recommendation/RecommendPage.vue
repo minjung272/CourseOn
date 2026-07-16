@@ -1,19 +1,48 @@
 <script setup>
 import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import tagMappings from './data/tagMappings.json'
+import { buildConditionQuery, parseConditions } from './services/recommendationService'
 
+const route = useRoute()
 const router = useRouter()
-const selections = reactive({ companion: '연인/커플', interest: '핫플/사진', region: '강북', style: '여유롭게 힐링', transport: '대중교통' })
+
+function options(groupKey, values) {
+  return values.map((value) => ({
+    value,
+    label: tagMappings.mappings[groupKey][value].label,
+  }))
+}
+
 const groups = [
-  { key: 'companion', icon: '♧', title: '동행', subtitle: '누구와 함께 떠나시나요?', options: ['혼자', '연인/커플', '친구', '가족'] },
-  { key: 'interest', icon: '♡', title: '관심사', subtitle: '어떤 것에 관심이 있으신가요?', options: ['핫플/사진', '역사/문화', '자연/힐링', '미식/카페', '쇼핑'] },
-  { key: 'region', icon: '⌖', title: '선호 지역', subtitle: '어떤 지역을 선호하시나요?', options: ['강북', '강남', '홍대/마포', '성수/뚝섬', '여의도/영등포'] },
-  { key: 'style', icon: '☆', title: '여행 스타일', subtitle: '어떤 여행을 원하시나요?', options: ['여유롭게 힐링', '알차게 핵심만', '체험 & 액티비티', '럭셔리 & 특별하게'] },
-  { key: 'transport', icon: '▣', title: '이동 수단', subtitle: '주로 어떤 수단을 이용하시나요?', options: ['대중교통', '도보 위주', '자전거/킥보드', '자동차'] },
+  { key: 'companion', icon: '♧', title: '동행', subtitle: '누구와 함께 떠나시나요?', options: options('companion', ['solo', 'couple', 'friends', 'family']) },
+  { key: 'interests', icon: '♡', title: '관심사', subtitle: '어떤 것에 관심이 있으신가요? (복수 선택 가능)', multiple: true, options: options('interests', ['hotplace-photo', 'history-culture', 'nature-healing', 'food-cafe', 'shopping']) },
+  { key: 'preferredArea', icon: '⌖', title: '선호 지역', subtitle: '어떤 지역을 선호하시나요?', options: options('preferredArea', ['gangbuk', 'gangnam', 'hongdae-mapo', 'seongsu-ttukseom', 'yeouido-yeongdeungpo']) },
+  { key: 'travelStyle', icon: '☆', title: '여행 스타일', subtitle: '어떤 여행을 원하시나요?', options: options('travelStyle', ['healing', 'highlights', 'activity', 'luxury']) },
+  { key: 'transport', icon: '▣', title: '이동 수단', subtitle: '주로 어떤 수단을 이용하시나요?', options: options('transport', ['public', 'walking', 'bike', 'car']) },
 ]
 
+const selections = reactive(parseConditions(route.query))
+
+function isSelected(group, value) {
+  const selected = selections[group.key]
+  return Array.isArray(selected) ? selected.includes(value) : selected === value
+}
+
+function select(group, value) {
+  if (!group.multiple) {
+    selections[group.key] = selections[group.key] === value ? '' : value
+    return
+  }
+
+  const selected = selections[group.key]
+  selections[group.key] = selected.includes(value)
+    ? selected.filter((item) => item !== value)
+    : [...selected, value]
+}
+
 function submit() {
-  router.push({ name: 'RecommendResult', query: { ...selections } })
+  router.push({ name: 'RecommendResult', query: buildConditionQuery(selections) })
 }
 </script>
 
@@ -29,7 +58,15 @@ function submit() {
         <section v-for="group in groups" :key="group.key" class="preference-row">
           <div class="preference-label"><span>{{ group.icon }}</span><div><h2>{{ group.title }}</h2><p>{{ group.subtitle }}</p></div></div>
           <div class="preference-options">
-            <button v-for="option in group.options" :key="option" type="button" :class="{ selected: selections[group.key] === option }" @click="selections[group.key] = option">{{ option }}</button>
+            <button
+              v-for="option in group.options"
+              :key="option.value"
+              type="button"
+              :class="{ selected: isSelected(group, option.value) }"
+              @click="select(group, option.value)"
+            >
+              {{ option.label }}
+            </button>
           </div>
         </section>
       </div>

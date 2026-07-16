@@ -10,7 +10,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "NODE_ENV=production node server/index.js",
-    "test": "node --test server/*.test.js"
+    "test": "node --test server/*.test.js",
+    "test:recommendation": "node --test src/features/recommendation/services/recommendationService.test.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

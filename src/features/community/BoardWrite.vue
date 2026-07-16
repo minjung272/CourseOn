@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getLocalProfile } from '../profile/services/profileService'
 import { createBoard, fetchBoard, updateBoard } from './services/boardService'
 
 const route = useRoute()
@@ -61,7 +62,13 @@ function validateForm() {
 }
 
 async function loadPost() {
-  if (!isEditing.value) return
+  const profile = getLocalProfile()
+  if (!isEditing.value) {
+    form.author = profile?.name ?? ''
+    form.password = profile?.password ?? ''
+    return
+  }
+
   loading.value = true
   submitError.value = ''
   try {
@@ -71,6 +78,7 @@ async function loadPost() {
     form.author = post.author
     form.content = post.content
     form.imageUrl = post.imageUrl
+    form.password = profile?.password ?? ''
     tagsInput.value = (post.tags || []).join(', ')
   } catch (error) {
     submitError.value = error.message
@@ -126,7 +134,7 @@ onMounted(loadPost)
             <label>작성자<input v-model="form.author" required maxlength="30" placeholder="표시할 작성자 이름을 입력해주세요"></label>
             <label>내용<div class="editor"><div class="toolbar">본문　│　<b>B</b>　<i>I</i>　<u>U</u>　☷　☰　≡</div><textarea v-model="form.content" required maxlength="3000" placeholder="여행에 대한 자세한 내용을 입력해주세요."></textarea><small>{{ form.content.length }} / 3000</small></div></label>
             <label>태그 (선택)<input v-model="tagsInput" maxlength="120" placeholder="쉼표로 태그를 구분해주세요"><small>예) 데이트, 야경, 맛집, 감성　최대 5개까지 등록 가능</small></label>
-            <label>비밀번호<input v-model="form.password" type="password" minlength="4" maxlength="20" required :autocomplete="isEditing ? 'current-password' : 'new-password'" :placeholder="isEditing ? '게시글 작성 시 설정한 비밀번호' : '게시글 수정/삭제 시 필요합니다 (4~20자)'"><small>* 공백만 입력할 수 없으며 비밀번호는 서버에서 암호화되어 저장됩니다.</small></label>
+            <label>비밀번호<input v-model="form.password" type="password" minlength="4" maxlength="20" required :autocomplete="isEditing ? 'current-password' : 'new-password'" :placeholder="isEditing ? '게시글 작성 시 설정한 비밀번호' : '게시글 수정/삭제 시 필요합니다 (4~20자)'"><small>* 현재 브라우저에 저장되는 데모용 비밀번호입니다.</small></label>
           </section>
           <section><strong>대표 이미지 <small>(선택)</small></strong><label class="image-upload"><input type="file" accept="image/png,image/jpeg" @change="previewImage"><img v-if="form.imageUrl" :src="form.imageUrl" alt="업로드 이미지 미리보기"><template v-else><span>▧</span><p>클릭하여 이미지를 업로드하세요.</p><small>JPG, PNG 파일만 가능 (최대 5MB)</small></template></label><button v-if="form.imageUrl" class="remove-image" type="button" @click="form.imageUrl = null">대표 이미지 제거</button></section>
         </div>

@@ -34,8 +34,14 @@
             <path d="m16.2 16.2 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </RouterLink>
-        <button class="profile-button" type="button" aria-label="내 프로필">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <button
+          class="profile-button"
+          type="button"
+          :aria-label="localProfile ? `${localProfile.name} 프로필` : '내 프로필'"
+          @click="profileOpen = true"
+        >
+          <span v-if="localProfile" class="profile-initial" aria-hidden="true">{{ localProfile.name.slice(0, 1) }}</span>
+          <svg v-else viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
             <path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
@@ -44,15 +50,24 @@
     </div>
     <div class="mobile-actions">
       <button type="button" aria-label="메뉴 열기" @click="isMenuOpen = !isMenuOpen">☰</button>
-      <button type="button" aria-label="내 프로필">♙</button>
+      <button type="button" aria-label="내 프로필" @click="profileOpen = true">♙</button>
     </div>
   </header>
+  <ProfilePanel
+    :open="profileOpen"
+    @close="profileOpen = false"
+    @profile-updated="localProfile = $event"
+  />
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import ProfilePanel from '../../features/profile/components/ProfilePanel.vue'
+import { getLocalProfile } from '../../features/profile/services/profileService'
 
 const isMenuOpen = ref(false)
+const profileOpen = ref(false)
+const localProfile = ref(getLocalProfile())
 
 const navItems = [
   { label: '홈', path: '/' },
@@ -194,6 +209,11 @@ const navItems = [
 .profile-button svg {
   width: 24px;
   height: 24px;
+}
+
+.profile-initial {
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .menu-button {

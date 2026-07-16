@@ -1,7 +1,8 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { featuredCourses } from '../../shared/data/demoContent'
+import { fetchCourses } from '../courses/services/courseService'
+import { getLocalProfile } from '../profile/services/profileService'
 import { deleteBoard, fetchBoard } from './services/boardService'
 
 const route = useRoute()
@@ -13,6 +14,7 @@ const showDeleteModal = ref(false)
 const deletePassword = ref('')
 const actionError = ref('')
 const deleting = ref(false)
+const recommendedCourse = ref(null)
 
 const updatedDate = computed(() => post.value?.updatedAt?.slice(0, 10).replaceAll('-', '.') || '')
 
@@ -28,8 +30,17 @@ async function loadPost() {
   }
 }
 
+async function loadRecommendedCourse() {
+  try {
+    const courses = await fetchCourses()
+    recommendedCourse.value = courses.find((course) => course.imageUrl) ?? courses[0] ?? null
+  } catch {
+    recommendedCourse.value = null
+  }
+}
+
 function openDeleteModal() {
-  deletePassword.value = ''
+  deletePassword.value = getLocalProfile()?.password ?? ''
   actionError.value = ''
   showDeleteModal.value = true
 }
@@ -58,7 +69,10 @@ async function removePost() {
   }
 }
 
-onMounted(loadPost)
+onMounted(() => {
+  loadPost()
+  loadRecommendedCourse()
+})
 watch(() => route.params.id, (id, previousId) => { if (id && id !== previousId) loadPost() })
 </script>
 
@@ -80,7 +94,7 @@ watch(() => route.params.id, (id, previousId) => { if (id && id !== previousId) 
       </article>
       <aside>
         <section class="surface summary-card"><h2>게시글 정보</h2><dl><div><dt>카테고리</dt><dd>{{ post.category }}</dd></div><div><dt>작성자</dt><dd>{{ post.author }}</dd></div><div><dt>최근 수정</dt><dd>{{ updatedDate }}</dd></div><div><dt>조회수</dt><dd>{{ post.views.toLocaleString() }}</dd></div></dl></section>
-        <section class="surface related-card"><h2>함께 보면 좋은 추천 코스</h2><img :src="featuredCourses[2].imageUrl" alt="남산 야경"><div><strong>남산 야경 데이트 코스</strong><p>서울의 야경을 즐기는 추천 코스</p><RouterLink class="outline-button" :to="`/courses/${featuredCourses[2].id}`">자세히 보기</RouterLink></div></section>
+        <section v-if="recommendedCourse" class="surface related-card"><h2>함께 보면 좋은 추천 코스</h2><img :src="recommendedCourse.imageUrl" :alt="recommendedCourse.title"><div><strong>{{ recommendedCourse.title }}</strong><p>{{ recommendedCourse.districtName }} · {{ recommendedCourse.tags.slice(0, 2).join(' · ') }}</p><RouterLink class="outline-button" :to="`/courses/${recommendedCourse.id}`">자세히 보기</RouterLink></div></section>
         <section class="surface post-actions"><button class="outline-button" type="button" @click="router.push(`/boards/${post.id}/edit`)">✎ 수정</button><button class="outline-button delete-button" type="button" @click="openDeleteModal">♧ 삭제</button><button class="primary-button" type="button" @click="router.push('/boards')">☷ 목록으로</button></section>
       </aside>
     </template>

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { fetchCourseById, fetchRelatedCourses } from '../services/courseService'
+import { isCourseSaved, toggleSavedCourse } from '../services/savedCourseService'
 
 const props = defineProps({
   courseId: {
@@ -24,24 +25,14 @@ const saved = ref(false)
 const noticeMessage = ref('')
 const mapEl = ref(null)
 
-const SAVED_COURSE_KEY = 'course-on:saved-course-ids'
 let map
 let noticeTimer
 let loadSequence = 0
 
 const mainTheme = computed(() => course.value?.tags.slice(0, 2).join(', ') || '서울여행')
 
-function getSavedCourseIds() {
-  try {
-    const savedIds = JSON.parse(sessionStorage.getItem(SAVED_COURSE_KEY) ?? '[]')
-    return Array.isArray(savedIds) ? savedIds.map(String) : []
-  } catch {
-    return []
-  }
-}
-
 function syncSavedState() {
-  saved.value = course.value ? getSavedCourseIds().includes(String(course.value.id)) : false
+  saved.value = course.value ? isCourseSaved(course.value.id) : false
 }
 
 function showNotice(message) {
@@ -55,20 +46,8 @@ function showNotice(message) {
 function toggleSaved() {
   if (!course.value) return
 
-  const courseId = String(course.value.id)
-  const savedIds = new Set(getSavedCourseIds())
-
-  if (savedIds.has(courseId)) {
-    savedIds.delete(courseId)
-    saved.value = false
-    showNotice('저장한 코스에서 삭제했어요.')
-  } else {
-    savedIds.add(courseId)
-    saved.value = true
-    showNotice('내 코스에 저장했어요.')
-  }
-
-  sessionStorage.setItem(SAVED_COURSE_KEY, JSON.stringify([...savedIds]))
+  saved.value = toggleSavedCourse(course.value.id)
+  showNotice(saved.value ? '내 코스에 저장했어요.' : '저장한 코스에서 삭제했어요.')
 }
 
 function goToCourseList() {

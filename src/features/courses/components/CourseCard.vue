@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue'
+import { isCourseSaved, toggleSavedCourse } from '../services/savedCourseService'
 
-defineProps({
+const props = defineProps({
   course: {
     type: Object,
     required: true,
@@ -10,6 +11,11 @@ defineProps({
 
 const emit = defineEmits(['select'])
 const imageFailed = ref(false)
+const saved = ref(isCourseSaved(props.course.id))
+
+function toggleSave() {
+  saved.value = toggleSavedCourse(props.course.id)
+}
 </script>
 
 <template>
@@ -43,7 +49,16 @@ const imageFailed = ref(false)
 
     <div class="card-actions">
       <button type="button" class="detail-button" @click="emit('select', course)">상세보기</button>
-      <button type="button" class="save-button" aria-label="코스 저장">♡</button>
+      <button
+        type="button"
+        class="save-button"
+        :class="{ saved }"
+        :aria-label="saved ? '코스 저장 해제' : '코스 저장'"
+        :aria-pressed="saved"
+        @click.stop="toggleSave"
+      >
+        {{ saved ? '♥' : '♡' }}
+      </button>
     </div>
   </article>
 </template>
@@ -123,6 +138,7 @@ h3 {
 
 .card-actions { display: flex; align-items: center; gap: 10px; }
 .save-button { width: 44px; height: 44px; border: 1px solid #e4defd; border-radius: 10px; color: var(--color-primary); background: var(--color-primary-pale); cursor: pointer; font-size: 21px; }
+.save-button.saved { color: #fff; border-color: var(--color-primary); background: var(--color-primary); }
 
 @media (max-width: 900px) {
   .course-card {

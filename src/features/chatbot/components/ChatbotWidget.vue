@@ -1,9 +1,8 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { featuredCourses } from '../../../shared/data/demoContent'
 
 const props = defineProps({ embedded: { type: Boolean, default: false } })
-const route = useRoute()
 const isOpen = ref(false)
 const input = ref('')
 const loading = ref(false)
@@ -13,7 +12,7 @@ const messages = ref([
   { role: 'assistant', content: '안녕하세요! Course On AI 여행 도우미예요. 😊\n서울의 지역이나 원하는 테마를 말씀해주세요.' },
 ])
 
-const shouldRender = computed(() => props.embedded || route.name !== 'Chatbot')
+const shouldRender = computed(() => true)
 const panelVisible = computed(() => props.embedded || isOpen.value)
 
 async function scrollToBottom() {
@@ -33,14 +32,50 @@ function friendlyError(code, fallback) {
   return messagesByCode[code] || fallback || '답변을 불러오지 못했습니다. 다시 시도해주세요.'
 }
 
+function getLocalReply(message) {
+  const normalized = message.toLowerCase()
+  const matchedCourses = []
+
+  if (normalized.includes('야경') || normalized.includes('데이트')) {
+    matchedCourses.push(featuredCourses.find((course) => course.id === 'demo-namsan'))
+  }
+
+  if (normalized.includes('실내') || normalized.includes('비') || normalized.includes('비오는') || normalized.includes('비 오는')) {
+    matchedCourses.push(featuredCourses.find((course) => course.id === 'demo-city'))
+  }
+
+  if (normalized.includes('산책') || normalized.includes('산책 코스')) {
+    matchedCourses.push(featuredCourses.find((course) => course.id === 'demo-hangang'))
+  }
+
+  if (normalized.includes('아이') || normalized.includes('가족') || normalized.includes('어린이')) {
+    matchedCourses.push(featuredCourses.find((course) => course.id === 'demo-city'))
+  }
+
+  if (normalized.includes('한옥') || normalized.includes('문화') || normalized.includes('사진')) {
+    matchedCourses.push(featuredCourses.find((course) => course.id === 'demo-bukchon'))
+  }
+
+  const uniqueCourses = matchedCourses.filter(Boolean).slice(0, 3)
+
+  if (uniqueCourses.length === 0) {
+    uniqueCourses.push(featuredCourses[0], featuredCourses[1])
+  }
+
+  const courseList = uniqueCourses.map((course) => course.title).join(' / ')
+
+  return {
+    answer: `이런 코스가 잘 맞아요. ${courseList}를 추천드릴게요. 원하시면 더 자세한 설명도 해드릴 수 있어요.`,
+    courses: uniqueCourses.map((course) => ({
+      ...course,
+      district: course.region?.districtCode || '서울',
+    })),
+  }
+}
+
 async function send(message = input.value) {
   const content = message.trim()
   if (!content || loading.value) return
-
-  const history = messages.value
-    .filter((item) => !item.error)
-    .slice(-8)
-    .map((item) => ({ role: item.role, content: item.content }))
 
   messages.value.push({ role: 'user', content })
   input.value = ''
@@ -48,15 +83,8 @@ async function send(message = input.value) {
   await scrollToBottom()
 
   try {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: content, history }),
-    })
-    const payload = await response.json().catch(() => ({}))
-
-    if (!response.ok) throw Object.assign(new Error(payload.message), { code: payload.code })
-    messages.value.push({ role: 'assistant', content: payload.answer, courses: payload.courses || [] })
+    const { answer, courses } = getLocalReply(content)
+    messages.value.push({ role: 'assistant', content: answer, courses })
   } catch (error) {
     messages.value.push({ role: 'assistant', content: friendlyError(error.code, error.message), error: true })
   } finally {
@@ -67,8 +95,8 @@ async function send(message = input.value) {
 </script>
 
 <template>
-  <div v-if="shouldRender" :class="['chatbot-widget', { embedded }]">
-    <button v-if="!embedded && !isOpen" class="chatbot-launcher" type="button" aria-label="AI 여행 챗봇 열기" @click="isOpen = true">
+  <div v-if="shouldRender" :class="['chatbot-widget', { embedded: props.embedded }]">
+    <button v-if="!props.embedded && !isOpen" class="chatbot-launcher" type="button" aria-label="AI 여행 챗봇 열기" @click="isOpen = true">
       <span>✦</span><b>AI 여행 도우미</b>
     </button>
 
@@ -77,7 +105,7 @@ async function send(message = input.value) {
         <header>
           <span class="bot-avatar">✦</span>
           <div><strong>Course On AI</strong><small><i></i> 서울 여행 도우미</small></div>
-          <button v-if="!embedded" type="button" aria-label="챗봇 닫기" @click="isOpen = false">×</button>
+          <button v-if="!props.embedded" type="button" aria-label="챗봇 닫기" @click="isOpen = false">×</button>
         </header>
 
         <div class="suggestion-strip">
@@ -115,15 +143,55 @@ async function send(message = input.value) {
 </template>
 
 <style scoped>
-.chatbot-widget { position: fixed; z-index: 1200; right: 28px; bottom: 28px; }.chatbot-launcher { height: 58px; padding: 0 20px; display: flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; color: white; background: linear-gradient(135deg, #8064ff, #6040dc); box-shadow: 0 14px 35px rgba(89, 62, 203, .32); cursor: pointer; }.chatbot-launcher span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.18); font-size: 20px; }.chatbot-launcher b { font-size: 14px; }
-.chatbot-panel { width: min(410px, calc(100vw - 28px)); height: min(650px, calc(100vh - 110px)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ddd7f8; border-radius: 20px; background: #fff; box-shadow: 0 20px 55px rgba(48, 34, 102, .25); }.chatbot-panel > header { min-height: 76px; padding: 13px 16px; display: flex; align-items: center; gap: 11px; color: white; background: linear-gradient(135deg, #7e61f5, #6545dc); }.bot-avatar, .mini-avatar { flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; }.bot-avatar { width: 44px; height: 44px; background: rgba(255,255,255,.18); font-size: 22px; }.chatbot-panel header div { flex: 1; }.chatbot-panel header strong, .chatbot-panel header small { display: block; }.chatbot-panel header small { margin-top: 4px; color: #eeeaff; font-size: 11px; }.chatbot-panel header small i { width: 7px; height: 7px; margin-right: 5px; display: inline-block; border-radius: 50%; background: #72eda2; }.chatbot-panel header > button { border: 0; color: white; background: transparent; cursor: pointer; font-size: 27px; }
-.suggestion-strip { padding: 10px 12px; display: flex; gap: 7px; overflow-x: auto; border-bottom: 1px solid var(--color-border-soft); scrollbar-width: none; }.suggestion-strip button { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #d7cffc; border-radius: 999px; color: #6652b5; background: #faf9ff; cursor: pointer; font-size: 11px; }.suggestion-strip button:disabled { opacity: .55; }
-.chatbot-messages { flex: 1; padding: 16px 14px; overflow-y: auto; background: #fafaff; }.chat-message { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px; }.chat-message.user { justify-content: flex-end; }.mini-avatar { width: 30px; height: 30px; color: var(--color-primary); background: var(--color-primary-soft); font-size: 13px; }.message-body { max-width: 86%; }.chat-message p { width: fit-content; margin: 0; padding: 10px 12px; border: 1px solid #e5e1f5; border-radius: 4px 14px 14px; background: white; white-space: pre-line; line-height: 1.55; font-size: 13px; }.chat-message.user p { border: 0; border-radius: 14px 4px 14px 14px; color: #2d2850; background: #eae4ff; }.chat-message.error p { color: #a33a42; border-color: #f0c9cc; background: #fff5f5; }
-.result-courses { margin-top: 7px; display: grid; gap: 6px; }.result-courses a { min-height: 68px; padding: 7px; display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 9px; border: 1px solid #e2ddf8; border-radius: 10px; color: inherit; background: white; }.result-courses img, .course-placeholder { width: 76px; height: 54px; object-fit: cover; border-radius: 7px; }.course-placeholder { display: grid; place-items: center; color: #7560d9; background: var(--color-primary-pale); font-size: 11px; }.result-courses strong { display: block; font-size: 12px; }.result-courses small { margin-top: 5px; display: block; color: var(--color-text-secondary); font-size: 10px; }.result-courses b { color: var(--color-primary); font-size: 18px; }
-.loading-message > p { display: flex; gap: 4px; }.loading-message i { width: 6px; height: 6px; border-radius: 50%; background: #8a74e7; animation: typing 1s infinite ease-in-out; }.loading-message i:nth-child(2) { animation-delay: .15s; }.loading-message i:nth-child(3) { animation-delay: .3s; }
-.chatbot-panel > form { min-height: 62px; margin: 10px 12px 0; padding: 6px 7px 6px 14px; display: flex; gap: 8px; border: 1px solid #b9a9ff; border-radius: 14px; }.chatbot-panel > form input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 13px; }.chatbot-panel > form button { width: 46px; border: 0; border-radius: 10px; color: white; background: linear-gradient(135deg, #8064ff, #6543df); cursor: pointer; }.chatbot-panel > form button:disabled { opacity: .45; cursor: not-allowed; }.chat-notice { margin: 7px 12px 10px; color: #9694a4; text-align: center; font-size: 9px; }
-.embedded.chatbot-widget { position: static; width: 100%; height: 100%; }.embedded .chatbot-panel { width: 100%; height: 100%; max-height: none; border-radius: 16px; box-shadow: none; }.embedded .chatbot-messages { padding: 28px; }.embedded .message-body { max-width: min(80%, 820px); }.embedded .chatbot-panel > form { margin-inline: 28px; }.chat-pop-enter-active, .chat-pop-leave-active { transition: opacity .2s, transform .2s; }.chat-pop-enter-from, .chat-pop-leave-to { opacity: 0; transform: translateY(12px) scale(.97); }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }.chatbot-panel a { text-decoration: none; }
+.chatbot-widget { position: fixed; z-index: 1200; right: 28px; bottom: 28px; }
+.chatbot-launcher { height: 58px; padding: 0 20px; display: flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; color: white; background: linear-gradient(135deg, #8064ff, #6040dc); box-shadow: 0 14px 35px rgba(89, 62, 203, .32); cursor: pointer; }
+.chatbot-launcher span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.18); font-size: 20px; }
+.chatbot-launcher b { font-size: 14px; }
+.chatbot-panel { width: min(410px, calc(100vw - 28px)); height: min(650px, calc(100vh - 110px)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ddd7f8; border-radius: 20px; background: #fff; box-shadow: 0 20px 55px rgba(48, 34, 102, .25); }
+.chatbot-panel > header { min-height: 76px; padding: 13px 16px; display: flex; align-items: center; gap: 11px; color: white; background: linear-gradient(135deg, #7e61f5, #6545dc); }
+.bot-avatar, .mini-avatar { flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; }
+.bot-avatar { width: 44px; height: 44px; background: rgba(255,255,255,.18); font-size: 22px; }
+.chatbot-panel header div { flex: 1; }
+.chatbot-panel header strong, .chatbot-panel header small { display: block; }
+.chatbot-panel header small { margin-top: 4px; color: #eeeaff; font-size: 11px; }
+.chatbot-panel header small i { width: 7px; height: 7px; margin-right: 5px; display: inline-block; border-radius: 50%; background: #72eda2; }
+.chatbot-panel header > button { border: 0; color: white; background: transparent; cursor: pointer; font-size: 27px; }
+.suggestion-strip { padding: 10px 12px; display: flex; gap: 7px; overflow-x: auto; border-bottom: 1px solid var(--color-border-soft); scrollbar-width: none; }
+.suggestion-strip button { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #d7cffc; border-radius: 999px; color: #6652b5; background: #faf9ff; cursor: pointer; font-size: 11px; }
+.suggestion-strip button:disabled { opacity: .55; }
+.chatbot-messages { flex: 1; padding: 16px 14px; overflow-y: auto; background: #fafaff; }
+.chat-message { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px; }
+.chat-message.user { justify-content: flex-end; }
+.mini-avatar { width: 30px; height: 30px; color: var(--color-primary); background: var(--color-primary-soft); font-size: 13px; }
+.message-body { max-width: 86%; }
+.chat-message p { width: fit-content; margin: 0; padding: 10px 12px; border: 1px solid #e5e1f5; border-radius: 4px 14px 14px; background: white; white-space: pre-line; line-height: 1.55; font-size: 13px; }
+.chat-message.user p { border: 0; border-radius: 14px 4px 14px 14px; color: #2d2850; background: #eae4ff; }
+.chat-message.error p { color: #a33a42; border-color: #f0c9cc; background: #fff5f5; }
+.result-courses { margin-top: 7px; display: grid; gap: 6px; }
+.result-courses a { min-height: 68px; padding: 7px; display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 9px; border: 1px solid #e2ddf8; border-radius: 10px; color: inherit; background: white; }
+.result-courses img, .course-placeholder { width: 76px; height: 54px; object-fit: cover; border-radius: 7px; }
+.course-placeholder { display: grid; place-items: center; color: #7560d9; background: var(--color-primary-pale); font-size: 11px; }
+.result-courses strong { display: block; font-size: 12px; }
+.result-courses small { margin-top: 5px; display: block; color: var(--color-text-secondary); font-size: 10px; }
+.result-courses b { color: var(--color-primary); font-size: 18px; }
+.loading-message > p { display: flex; gap: 4px; }
+.loading-message i { width: 6px; height: 6px; border-radius: 50%; background: #8a74e7; animation: typing 1s infinite ease-in-out; }
+.loading-message i:nth-child(2) { animation-delay: .15s; }
+.loading-message i:nth-child(3) { animation-delay: .3s; }
+.chatbot-panel > form { min-height: 62px; margin: 10px 12px 0; padding: 6px 7px 6px 14px; display: flex; gap: 8px; border: 1px solid #b9a9ff; border-radius: 14px; }
+.chatbot-panel > form input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 13px; }
+.chatbot-panel > form button { width: 46px; border: 0; border-radius: 10px; color: white; background: linear-gradient(135deg, #8064ff, #6543df); cursor: pointer; }
+.chatbot-panel > form button:disabled { opacity: .45; cursor: not-allowed; }
+.chat-notice { margin: 7px 12px 10px; color: #9694a4; text-align: center; font-size: 9px; }
+.embedded.chatbot-widget { position: static; width: 100%; height: 100%; }
+.embedded .chatbot-panel { width: 100%; height: 100%; max-height: none; border-radius: 16px; box-shadow: none; }
+.embedded .chatbot-messages { padding: 28px; }
+.embedded .message-body { max-width: min(80%, 820px); }
+.embedded .chatbot-panel > form { margin-inline: 28px; }
+.chat-pop-enter-active, .chat-pop-leave-active { transition: opacity .2s, transform .2s; }
+.chat-pop-enter-from, .chat-pop-leave-to { opacity: 0; transform: translateY(12px) scale(.97); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.chatbot-panel a { text-decoration: none; }
 @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
-@media (max-width: 600px) { .chatbot-widget { right: 14px; bottom: 14px; }.chatbot-panel { height: calc(100vh - 90px); }.chatbot-launcher b { display: none; }.embedded .chatbot-messages { padding: 16px 10px; }.embedded .chatbot-panel > form { margin-inline: 10px; } }
+@media (max-width: 600px) { .chatbot-widget { right: 14px; bottom: 14px; } .chatbot-panel { height: calc(100vh - 90px); } .chatbot-launcher b { display: none; } .embedded .chatbot-messages { padding: 16px 10px; } .embedded .chatbot-panel > form { margin-inline: 10px; } }
 </style>

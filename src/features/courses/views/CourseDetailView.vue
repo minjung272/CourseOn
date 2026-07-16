@@ -33,7 +33,7 @@ const mainTheme = computed(() => course.value?.tags.slice(0, 2).join(', ') || '�
 
 function getSavedCourseIds() {
   try {
-    const savedIds = JSON.parse(localStorage.getItem(SAVED_COURSE_KEY) ?? '[]')
+    const savedIds = JSON.parse(sessionStorage.getItem(SAVED_COURSE_KEY) ?? '[]')
     return Array.isArray(savedIds) ? savedIds.map(String) : []
   } catch {
     return []
@@ -68,7 +68,7 @@ function toggleSaved() {
     showNotice('내 코스에 저장했어요.')
   }
 
-  localStorage.setItem(SAVED_COURSE_KEY, JSON.stringify([...savedIds]))
+  sessionStorage.setItem(SAVED_COURSE_KEY, JSON.stringify([...savedIds]))
 }
 
 function goToCourseList() {

@@ -56,18 +56,18 @@ export function buildConditionQuery(conditions) {
 }
 
 export function saveRecommendationConditions(conditions) {
-  if (typeof localStorage === 'undefined') return
-  localStorage.setItem(
+  if (typeof sessionStorage === 'undefined') return
+  sessionStorage.setItem(
     RECOMMENDATION_STORAGE_KEY,
     JSON.stringify(buildConditionQuery(conditions)),
   )
 }
 
 export function loadRecommendationConditions() {
-  if (typeof localStorage === 'undefined') return null
+  if (typeof sessionStorage === 'undefined') return null
 
   try {
-    const savedQuery = JSON.parse(localStorage.getItem(RECOMMENDATION_STORAGE_KEY) ?? 'null')
+    const savedQuery = JSON.parse(sessionStorage.getItem(RECOMMENDATION_STORAGE_KEY) ?? 'null')
     return savedQuery && typeof savedQuery === 'object'
       ? parseConditions(savedQuery)
       : null
@@ -77,8 +77,8 @@ export function loadRecommendationConditions() {
 }
 
 export function clearRecommendationConditions() {
-  if (typeof localStorage === 'undefined') return
-  localStorage.removeItem(RECOMMENDATION_STORAGE_KEY)
+  if (typeof sessionStorage === 'undefined') return
+  sessionStorage.removeItem(RECOMMENDATION_STORAGE_KEY)
 }
 
 function getSelectedIds(group, conditions) {

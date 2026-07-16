@@ -30,6 +30,11 @@ const THEME_EXPANSIONS = {
   맛집: ['맛집', '도심여행'],
 }
 
+const TRAVEL_TOPIC_PATTERN = /(여행|코스|관광|나들이|가볼\s*만한|갈\s*만한|산책|야경|역사|맛집|카페|자연|힐링|데이트|가족|아이|실내|사진|체험)/
+const PROMPT_INJECTION_PATTERN = /(시스템\s*(프롬프트|지시)|내부\s*(설정|규칙|지시)|숨겨진\s*(규칙|설정)|이전\s*(규칙|지시).*(무시|삭제)|관리자.*(공개|출력))/
+const FOLLOW_UP_PATTERN = /(그\s*중|그중에서|그럼|그러면|거기|그곳|그\s*코스|그거)/
+const PARTICLE_PATTERN = /(에서|에게서|으로|이랑은|이랑|하고|부터|까지|처럼|보다|은|는|이|가|을|를|에|의|도|만|와|과|로)$/
+
 export const SYSTEM_PROMPT = `당신은 서울 여행 서비스 Course On의 친절하고 정확한 한국어 여행 도우미입니다.
 
 반드시 지킬 규칙:
@@ -58,9 +63,24 @@ function normalize(value = '') {
   return value.toLowerCase().replace(/[^0-9a-z가-힣\s]/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
+function stripParticle(term) {
+  const stripped = term.replace(PARTICLE_PATTERN, '')
+  return stripped.length > 1 ? stripped : term
+}
+
+function hasTravelIntent(normalized) {
+  if (PROMPT_INJECTION_PATTERN.test(normalized)) return false
+  if (Object.values(DISTRICT_BY_AREA_CODE).some((district) => normalized.includes(district))) return true
+  if (/서울.*(추천|여행|코스)/.test(normalized)) return true
+  return TRAVEL_TOPIC_PATTERN.test(normalized)
+}
+
 function queryTerms(question) {
   const normalized = normalize(question)
-  const terms = normalized.split(' ').filter((term) => term.length > 1 && !STOP_WORDS.has(term))
+  const terms = normalized
+    .split(' ')
+    .map(stripParticle)
+    .filter((term) => term.length > 1 && !STOP_WORDS.has(term))
 
   Object.entries(THEME_EXPANSIONS).forEach(([keyword, expansions]) => {
     if (normalized.includes(keyword)) terms.push(...expansions)
@@ -104,7 +124,12 @@ export function selectRelevantCourses(courses, question, limit = 8) {
 
   scored.sort((a, b) => b.score - a.score || a.index - b.index)
   const positive = scored.filter(({ score }) => score > 0)
-  const pool = positive.length ? positive : scored
+  if (!positive.length && !hasTravelIntent(normalized)) return []
+
+  const districtMatches = districtMention
+    ? positive.filter(({ district }) => district === districtMention)
+    : []
+  const pool = districtMatches.length ? districtMatches : positive.length ? positive : scored
   const selected = []
   const usedDistricts = new Set()
 
@@ -139,6 +164,17 @@ function sanitizeHistory(history = []) {
 
 function isCasualMessage(message) {
   return CASUAL_MESSAGE_PATTERN.test(message.trim())
+}
+
+function recommendationQuery(message, history) {
+  const normalized = normalize(message)
+  if (!FOLLOW_UP_PATTERN.test(normalized)) return message
+
+  const previousUserMessage = [...sanitizeHistory(history)]
+    .reverse()
+    .find((item) => item.role === 'user')?.content
+
+  return previousUserMessage ? `${previousUserMessage} ${message}` : message
 }
 
 export function extractResponseText(response) {
@@ -184,7 +220,9 @@ function responseRequest({ model, input, maxOutputTokens }) {
 
 export async function generateChatResponse({ client, model, message, history, courses }) {
   const casual = isCasualMessage(message)
-  const selectedCourses = casual ? [] : selectRelevantCourses(courses, message)
+  const selectedCourses = casual
+    ? []
+    : selectRelevantCourses(courses, recommendationQuery(message, history), 3)
   const input = [
     ...sanitizeHistory(history),
     {

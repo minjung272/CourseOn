@@ -13,10 +13,10 @@
 
 <script setup>
 const stats = [
-  { icon: '⚑', value: '120+', label: '추천 코스' },
-  { icon: '▣', value: '350+', label: '명소 정보' },
-  { icon: '●●●', value: '2,500+', label: '여행 후기' },
-  { icon: '★', value: '4.8 / 5', label: '만족도' },
+  { icon: '⚑', value: '51개', label: '등록 여행코스' },
+  { icon: '⌖', value: '15개', label: '등록 지역' },
+  { icon: '#', value: '9개', label: '테마 태그' },
+  { icon: '◎', value: '51개', label: '지도 좌표' },
 ]
 </script>
 

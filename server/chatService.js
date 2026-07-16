@@ -287,7 +287,7 @@ export function mapOpenAIError(error) {
   const apiCode = error?.code || error?.error?.code || ''
   const detail = String(error?.message || '').toLowerCase()
 
-  if (status === 401) return { status: 401, code: 'AUTH_ERROR', message: 'API 키가 유효하지 않습니다. .env의 키를 확인해주세요.' }
+  if (status === 401) return { status: 401, code: 'AUTH_ERROR', message: 'API 키가 유효하지 않습니다. OPENAI_API_KEY 환경변수를 확인해주세요.' }
   if (status === 403) return { status: 403, code: 'MODEL_ACCESS_ERROR', message: '현재 API 프로젝트에서 선택한 모델을 사용할 권한이 없습니다. OPENAI_MODEL을 확인해주세요.' }
   if (status === 429 && (apiCode === 'insufficient_quota' || detail.includes('quota') || detail.includes('billing'))) {
     return { status: 429, code: 'QUOTA_EXCEEDED', message: 'OpenAI API 사용량 또는 결제 한도를 초과했습니다.' }

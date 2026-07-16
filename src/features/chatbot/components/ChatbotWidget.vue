@@ -47,9 +47,9 @@ async function scrollToBottom() {
 
 function friendlyError(code, fallback) {
   const messagesByCode = {
-    CONFIGURATION_ERROR: '.env 파일에 OPENAI_API_KEY를 입력하고 개발 서버를 다시 실행해주세요.',
-    AUTH_ERROR: 'API 키가 올바르지 않습니다. .env의 OPENAI_API_KEY를 확인해주세요.',
-    MODEL_ACCESS_ERROR: '현재 API 프로젝트에서 이 모델을 사용할 수 없습니다. .env의 OPENAI_MODEL을 확인해주세요.',
+    CONFIGURATION_ERROR: 'OPENAI_API_KEY 환경변수를 설정한 뒤 서버를 재시작하거나 다시 배포해주세요.',
+    AUTH_ERROR: 'API 키가 올바르지 않습니다. OPENAI_API_KEY 환경변수를 확인해주세요.',
+    MODEL_ACCESS_ERROR: '현재 API 프로젝트에서 이 모델을 사용할 수 없습니다. OPENAI_MODEL 환경변수를 확인해주세요.',
     QUOTA_EXCEEDED: 'OpenAI API 사용량 또는 결제 한도를 초과했습니다. 한도를 확인한 뒤 다시 시도해주세요.',
     RATE_LIMIT: '요청이 잠시 몰렸어요. 잠깐 기다렸다가 다시 질문해주세요.',
     OPENAI_UNAVAILABLE: 'AI 서비스가 잠시 응답하지 않아요. 잠시 후 다시 시도해주세요.',

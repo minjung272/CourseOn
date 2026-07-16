@@ -47,7 +47,7 @@ export function createApp({ client, boardStore } = {}) {
     if (!openai) {
       return response.status(503).json({
         code: 'CONFIGURATION_ERROR',
-        message: '.env 파일에 OPENAI_API_KEY를 입력한 뒤 개발 서버를 다시 실행해주세요.',
+        message: 'OPENAI_API_KEY 환경변수를 설정한 뒤 서버를 다시 실행해주세요.',
       })
     }
 
